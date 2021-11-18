@@ -2,7 +2,6 @@
 #define CUSTOMPLOTTER_H
 
 #include <QWidget>
-#include "circlepalette.h"
 
 #include <QStyledItemDelegate>
 #include <QListView>
@@ -12,77 +11,70 @@
 #include <qwt_scale_widget.h>
 #include <QSet>
 #include <fftw3.h>
+#include <QComboBox>
+#include <QPushButton>
+#include <QTableView>
 
-class QTimer;
-class QTableView;
-class QPushButton;
 
-enum ColorMap
-{
-    RGBMap,
-    HueMap,
-    IndexMap,    
-    AlphaMap
-};
+#include "enums/colormap.h"
 
-class SpectrogramData : public QwtMatrixRasterData {
+#include "model/spectrogramdata.h"
 
-public:
-    SpectrogramData();
-    SpectrogramData(quint16 xMax, quint16 yMax);
-    void refreshMatrix();
-    void updateMatrix(const quint32 &n, const quint32 &m, const QVector<qreal> &vector);
-    void setBackground();
-};
+#include "ui/colorscheme/maincolorschemewidget.h"
+#include "circlepalette.h"
+
 
 class CustomPlotterWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit CustomPlotterWidget(qint32 _targetID, bool _displayPlot = true, QWidget *parent = nullptr);
+    explicit CustomPlotterWidget(qint32 _targetID, bool _displayPlot, QWidget *parent);
     ~CustomPlotterWidget();
 
-    void updateData(const quint32 &n, const quint32 &m, const quint32 &counter, const QVector<qreal> &vector);
-    void forceSendColorRangesToScene();
+    void UpdateData(const quint32 &n, const quint32 &m, const quint32 &counter, const QVector<qreal> &vector);
+    void ForceSendColorRangesToScene();
 
-signals:
-    void setPositionOnVectorOfDSP(const qint32 target, quint32 pos);
-    void sendColorRangesToScene(const qint32 target, ColorRanges colorRanges);
+Q_SIGNALS:
+    void ToSetDSPDataOnPlotter(const qint32 target, quint32 pos);
+    void ToSendColorRangesToScene(const qint32 target, ColorRanges colorRanges);
 
-public slots:
-    void showContour( bool on );
-    void showSpectrogram( bool on );
-    void setColorMap( int );
-    void setColorsMap(const ColorsMap &colors );
-    void setAlpha( int );
-    void setAntiAlasing(int on);
+public Q_SLOTS:
+    void OnShowContour( bool on );
+    void OnShowSpectrogram( bool on );
+    void OnSetColorMap( int );
+    void OnSetColorsMap(const ColorsMap &colors );
+    void OnSetAlpha( int );
+    void OnSetAntiAlasing(int on);
 
-    void updatePlotSlot();
-    void pannerHandler(int dx,int dy);
-    void zoomHandler(const QRectF & rect);
+    void OnUpdatePlotSlot();
+    void OnPannerHandler(int dx,int dy);
+    void OnZoomHandler(const QRectF & rect);
 
-    void schemeChangedSlot(QString nameScheme, QString newNameScheme, QVector<QColor> colors, QVector<int> ranges);
-    void schemeDeletedSlot(QString nameScheme);
+    void OnSchemeChange(QString &nameScheme, QString &newNameScheme, QVector<QColor> &colors, QVector<int> &ranges);
+    void OnSchemeDelete(QString nameScheme);
 
-    void setSliderLimit(quint32 counter);
+private Q_SLOTS:
+    void startStopClicked();
+    void sliderOffset();
+    void timerTimeout();
+
+public:
+    void SetSliderLimit(quint32 counter);
 
 private:
     void setItemToPresetComboBox(const quint32 &index, const MapOfColorRanges::iterator &itemOfColorMap);
     void createColorArray(const ColorRanges &colorRanges);
 
-private slots:
-    void startStopClicked();
-    void sliderOffset();
-    void timerTimeout();
+
 
     void currentSchemeChanged();
 
 private:
-    QwtPlot *plot;
+    QwtPlot *m_qwtPlot;
     QwtPlotSpectrogram *d_spectrogram;
-    SpectrogramData *sp_data;
+    SpectrogramData *m_spectogramData;
 
-    ColorSchemeWidget *colorSchemeWidget;
+    MainColorSchemeWidget *m_colorSchemeWidget;
 
     QSlider *sliderControl;
     QPushButton *startStopButton;
@@ -99,25 +91,6 @@ private:
     const bool displayPlot;
 };
 
-class DSPSettingWidget : public QWidget {
-    Q_OBJECT
-public:
-    explicit DSPSettingWidget(QWidget *parent = nullptr);
 
-signals:
-    void updateTraceInfoToDelegate(qint32 trackId, bool isReset);
-
-public slots:
-    void customMenuForTable(QPoint pos);
-    void updateTraceInfo(qint32 trackId, bool isReset);
-
-private:
-    void initMenu();
-
-private:
-    QTableView *tableView;
-    QMenu *tableMenu;
-    CustomPlotterWidget *plotterWidget;
-};
 
 #endif // CUSTOMPLOTTER_H
