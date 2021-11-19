@@ -6,7 +6,6 @@ enum RangeSliderMarkSelected {
     SecondMark = 1,
     ThirdMark = 2,
     FourthMark = 3,
-
     NoMarkSelected = 10
 };
 

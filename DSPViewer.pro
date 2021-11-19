@@ -24,30 +24,36 @@ include($$PWD/colorCircles/color_widgets.pri)
 
 SOURCES += \
         main.cpp \
-    circlepalette.cpp \
-    customplotter.cpp \
-    mainwidget.cpp \
+    presenter/dsppresenter.cpp \
+    ui/dspwidget/circlepalette.cpp \
+    ui/dspwidget/customplotter.cpp \
     model/colorpoint.cpp \
     model/spectrogramdata.cpp \
     presenter/colorscheme/colorschemepresenter.cpp \
     ui/colorscheme/allgradientswidget.cpp \
-    ui/colorscheme/gradientinfowidget.cpp \
+    ui/colorscheme/gradientInfo/gradientinfowidget.cpp \
+    ui/colorscheme/gradientInfo/gradientlabel.cpp \
+    ui/colorscheme/gradientInfo/rangeslider.cpp \
     ui/colorscheme/maincolorschemewidget.cpp \
-    ui/dspsettingwidget.cpp \
-    ui/colorscheme/gradientlabel.cpp \
-    ui/colorscheme/rangeslider.cpp \
     ui/colorscheme/colorChange/colorchangerwidget.cpp \
-    ui/colorscheme/colorChange/allcolorswidget.cpp
+    ui/colorscheme/colorChange/allcolorswidget.cpp \
+    ui/dspwidget/maindspwidget.cpp \
+    ui/dspwidget/spektroPlotter/alphacolormap.cpp \
+    ui/dspwidget/spektroPlotter/huecolormap.cpp \
+    ui/dspwidget/spektroPlotter/linearcolormapindexed.cpp \
+    ui/dspwidget/spektroPlotter/linearcolormaprgb.cpp \
+    ui/dspwidget/spektroPlotter/plotterzoomer.cpp \
+    ui/dspwidget/topuserpanel.cpp \
+    ui/dspwidget/dsphistorywidget.cpp
 
 HEADERS += \
-    circlepalette.h \
-    colorchemepresenter.h \
-    customplotter.h \
-    enums/SliderHandleSelected.h \
+    enums/colorscheme/rangeslidermarkselected.h \
+    enums/colorscheme/rangesliderpointscount.h \
+    presenter/dsppresenter.h \
+    ui/dspwidget/circlepalette.h \
+    ui/dspwidget/customplotter.h \
     enums/colormap.h \
     enums/prestoPalette.h \
-    enums/rangesliderpointscount.h \
-    mainwidget.h \
     model/colorpoint.h \
     model/spectrogramdata.h \
     presenter/colorscheme/colorschemepresenter.h \
@@ -55,17 +61,25 @@ HEADERS += \
     structs/POIDistSpeedPortrait.h \
     structs/POIDistSpeedPortraitHeader.h \
     structs/RawBlockDSP.h \
-    structs/colorranges.h \
+    structs/colorscheme/colorranges.h \
     structs/fftwinfo.h \
     structs/timeval64.h \
     ui/colorscheme/allgradientswidget.h \
-    ui/colorscheme/gradientinfowidget.h \
+    ui/colorscheme/gradientInfo/gradientinfowidget.h \
+    ui/colorscheme/gradientInfo/gradientlabel.h \
+    ui/colorscheme/gradientInfo/rangeslider.h \
     ui/colorscheme/maincolorschemewidget.h \
-    ui/dspsettingwidget.h \
-    ui/colorscheme/gradientlabel.h \
-    ui/colorscheme/rangeslider.h \
     ui/colorscheme/colorChange/colorchangerwidget.h \
-    ui/colorscheme/colorChange/allcolorswidget.h
+    ui/colorscheme/colorChange/allcolorswidget.h \
+    ui/colorscheme/basiccolors.h \
+    ui/dspwidget/maindspwidget.h \
+    ui/dspwidget/spektroPlotter/alphacolormap.h \
+    ui/dspwidget/spektroPlotter/huecolormap.h \
+    ui/dspwidget/spektroPlotter/linearcolormapindexed.h \
+    ui/dspwidget/spektroPlotter/linearcolormaprgb.h \
+    ui/dspwidget/spektroPlotter/plotterzoomer.h \
+    ui/dspwidget/topuserpanel.h \
+    ui/dspwidget/dsphistorywidget.h
 
 unix {
     LIBS += -L/usr/lib/ -lqwt-qt5 -lqwtmathml-qt5

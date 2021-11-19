@@ -1,5 +1,5 @@
-#ifndef ALLCOLORSWIDGET_H
-#define ALLCOLORSWIDGET_H
+#ifndef UI_COLORSSCHEME_COLORCHANGE_ALLCOLORSWIDGET_H
+#define UI_COLORSSCHEME_COLORCHANGE_ALLCOLORSWIDGET_H
 
 #include <QBoxLayout>
 #include <QGroupBox>
@@ -21,17 +21,16 @@ private:
     void InsertWidgetsIntoLayouts();
     void FillUI();
     void ConnectObjects();
-Q_SIGNALS:
-    void ToButtonClicked();
-
 private Q_SLOTS:
-    void OnColorButtonClicked(const int id);
+    void OnColorButtonClicked(const int buttonId);
 
 public Q_SLOTS:
     void OnSetColorToButton(const QColor &color);
 
 public:
-    void ChangeColors(const QVector<QColor> &colors);
+    void SetColors(const QVector<QColor> &colors);
+    const QVector<QColor> GetColors();
+    int GetCurrentIndex();
 private:
     void SetToDefault(int count);
     void SetButtonsEnabled(int count);
@@ -45,4 +44,4 @@ private:
     int m_currentIdChecked;
 };
 
-#endif // ALLCOLORSWIDGET_H
+#endif // UI_COLORSSCHEME_COLORCHANGE_ALLCOLORSWIDGET_H

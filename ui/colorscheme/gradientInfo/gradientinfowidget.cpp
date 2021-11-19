@@ -1,6 +1,6 @@
 #include "gradientinfowidget.h"
 
-GradientInfoWidget::GradientInfoWidget(ColorSchemePresenter *presenter, QWidget *parent)
+GradientInfoWidget::GradientInfoWidget(QSharedPointer<ColorSchemePresenter> presenter, QWidget *parent)
     : QWidget(parent)
     , m_presenter(presenter)
 {
@@ -15,7 +15,23 @@ GradientInfoWidget::~GradientInfoWidget()
     delete m_widgetsLayout;
     delete m_mainLayout;
 
+    delete m_colorSchemeNameLabel;
+    delete m_schemeNameLineEdit;
+
+    delete m_colorNumberLabel;
+    delete m_numberOfPointsComboBox;
+
+    delete m_rangesLabel;
+    delete m_rangesSlider;
+
+    delete m_resultGradientLabel;
+    delete m_gradientLabel;
+
+    delete m_actionLabel;
+    delete m_saveButton;
+
     delete m_mainGroupBox;
+
 }
 
 void GradientInfoWidget::CreateUI()
@@ -33,10 +49,10 @@ void GradientInfoWidget::CreateUI()
     m_numberOfPointsComboBox=new QComboBox();
 
     m_rangesLabel=new QLabel();
-    m_rangesSlider=new RangeSlider(m_doubleHandlesVector, m_tripleHandlesVector, m_quadrupleHandlesVector, this);
+    m_rangesSlider=new RangeSlider(this);
 
     m_resultGradientLabel=new QLabel();
-    m_gradientLabel=new GradientLabel(m_doubleHandlesVector, m_tripleHandlesVector, m_quadrupleHandlesVector, m_doubleHandlesColorVector, m_tripleHandlesColorVector, m_quadrupleHandlesColorVector, this);
+    m_gradientLabel=new GradientLabel(this);
 
     m_actionLabel=new QLabel();
     m_saveButton=new QPushButton();
@@ -76,7 +92,7 @@ void GradientInfoWidget::FillUI()
     m_numberOfPointsComboBox->addItems(QStringList({"2",
                                                     "3",
                                                     "4"}));
-    m_numberOfPointsComboBox->setCurrentIndex(1);
+    m_numberOfPointsComboBox->setCurrentIndex(0);
     m_numberOfPointsComboBox->setEditable(false);
 
     m_rangesLabel->setText("Значения точек:");
@@ -101,7 +117,7 @@ void GradientInfoWidget::OnSaveButtonClick()
     auto colors=m_gradientLabel->GetColors();
     auto ranges=m_gradientLabel->GetRanges();
     m_presenter-> SaveGradient(currentName, ranges, colors);
-    Q_EMIT ToRepaintComboBox();
+    Q_EMIT ToUpdateGradient();
 }
 
 void GradientInfoWidget::OnComboBoxPointsCountChange(int indexComboBoxValue)
@@ -114,22 +130,15 @@ void GradientInfoWidget::OnComboBoxPointsCountChange(int indexComboBoxValue)
         RangeSliderPointsCount pointCount=static_cast<RangeSliderPointsCount>(indexComboBoxValue+2);
         m_gradientLabel->SetDefaultRanges(pointCount);
         m_rangesSlider->SetDefaultRanges(pointCount);
+        Q_EMIT ToColorsCountChanged(pointCount);
         break;
     }
     default:
     {
-        qFatal("Поведение не реализовано");
+        Q_UNREACHABLE();
         break;
     }
     }
-}
-
-void GradientInfoWidget::ChangeGradient(const QString &gradientName, const QVector<QColor> &colors, const QVector<int> &ranges)
-{
-    m_schemeNameLineEdit->setText(gradientName);
-    m_rangesSlider->SetRangesVector(ranges);
-    m_numberOfPointsComboBox->setCurrentIndex(ranges.count()-2);
-    m_gradientLabel->SetRangesAndColors(colors, ranges);
 }
 
 void GradientInfoWidget::OnAppendGradient()
@@ -137,4 +146,17 @@ void GradientInfoWidget::OnAppendGradient()
     m_schemeNameLineEdit->clear();
     m_rangesSlider->SetDefaultRanges(RangeSliderPointsCount::TripleHandles);
     m_gradientLabel->SetDefaultRanges(RangeSliderPointsCount::TripleHandles);
+}
+
+void GradientInfoWidget::OnChangeGradient(const QString &gradientName, const QVector<QColor> &colors, const QVector<int> &ranges)
+{
+    m_schemeNameLineEdit->setText(gradientName);
+    m_rangesSlider->SetRangesVector(ranges);
+    m_numberOfPointsComboBox->setCurrentIndex(ranges.count()-2);
+    m_gradientLabel->SetRangesAndColors(colors, ranges);
+}
+
+void GradientInfoWidget::OnUpdateColors(const QVector<QColor> &colors)
+{
+    m_gradientLabel->SetColors(colors);
 }

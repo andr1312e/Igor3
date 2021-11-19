@@ -9,7 +9,7 @@
 #include <QApplication>
 #include <QJsonDocument>
 
-#include "structs/colorranges.h"
+#include "structs/colorscheme/colorranges.h"
 
 using MapOfColorRanges = QMap<QString, ColorRanges>;
 
@@ -20,19 +20,19 @@ public:
     explicit ColorSchemePresenter(QObject *parent);
     ~ColorSchemePresenter();
 
-    const QList<QString> GetAllColorNames();
+    const QList<QString> GetAllGradientsNames();
     const QVector<QColor> GetColorVector(const QString &gradientName);
     const QVector<int> GetRanges(const QString &gradientName);
     const QVector<QPoint> GetPoints(const QString &gradientName);
+    const ColorRanges &GetColorRanges(const QString &gradientName);
 
     void DeleteGradientByName(const QString &gradientName);
     void SaveGradient(const QString &gradientName, const QVector<int> &ranges, const QVector<QColor> &colors);
-Q_SIGNALS:
-    void ToChangeScheme(const QString &gradientName, ColorRanges &range);
 public Q_SLOTS:
     void OnSchemeEdit(const QString &gradientName, ColorRanges &range);
-private:
+public:
     void GetPresetFromFile();
+private:
     void ParseJsonDocument(const QJsonObject &array, QStringList &namesList);
     void NameAttributeAppedToList(QStringList &list, const QJsonObject &object);
     void RangeAttributeAppedToColorRanges(ColorRanges &ranges, const QJsonObject &object);

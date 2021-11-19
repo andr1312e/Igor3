@@ -32,177 +32,6 @@ quint16 xMaxInterval = 32;
 quint16 yMaxInterval = 2512;
 const quint16 zMaxInterval = 100;
 
-class MyZoomer: public QwtPlotZoomer
-{
-public:
-    MyZoomer( QWidget *canvas ):
-        QwtPlotZoomer( canvas )
-    {
-        setTrackerMode( AlwaysOn );
-    }
-
-    virtual QwtText trackerTextF( const QPointF &pos ) const
-    {
-        QColor bg( Qt::white );
-        bg.setAlpha( 200 );
-
-        //QwtText text = QwtPlotZoomer::trackerTextF( pos );
-        //text.setBackgroundBrush( QBrush( bg ) );
-
-        QwtPlotSpectrogram *item = reinterpret_cast<QwtPlotSpectrogram *>(plot()->itemList( QwtPlotItem::Rtti_PlotSpectrogram ).at(0));
-        qreal value = item->data()->value(pos.x(), pos.y());
-
-        QString strCoords = QString("%1, %2, %3").arg(qFloor(pos.x())).arg(qFloor(pos.y())).arg(qFloor(value));
-        QwtText text(strCoords);
-        text.setBackgroundBrush( QBrush( bg ) );
-
-        return text;
-    }
-};
-
-
-
-
-
-
-class LinearColorMapRGB: public QwtLinearColorMap
-{
-public:
-    LinearColorMapRGB():
-        QwtLinearColorMap( Qt::black, Qt::red, QwtColorMap::RGB )
-
-    {
-        //addColorStop( 0.1, Qt::cyan );
-        //addColorStop( 0.6, Qt::green );
-        //addColorStop( 0.95, Qt::yellow );
-
-        //addColorStop( 0.1, Qt::red );
-        //addColorStop( 0.6, Qt::yellow );
-        //addColorStop( 0.0, Qt::blue );
-    }
-
-    LinearColorMapRGB(ColorsMap colorMap) :
-        QwtLinearColorMap( colorMap.first().second, colorMap.last().second, QwtColorMap::RGB )
-    {
-        for (auto &item : colorMap) {
-            addColorStop(item.first, item.second);
-        }
-        setMode(Mode::ScaledColors);
-    }
-};
-
-class LinearColorMapIndexed: public QwtLinearColorMap
-{
-public:
-    LinearColorMapIndexed():
-        QwtLinearColorMap( Qt::darkCyan, Qt::red, QwtColorMap::Indexed )
-    {
-        //addColorStop( 0.1, Qt::cyan );
-        //addColorStop( 0.6, Qt::green );
-        //addColorStop( 0.95, Qt::yellow );
-
-        addColorStop( 0.1, Qt::red );
-        addColorStop( 0.5, Qt::yellow );
-        addColorStop( 0.0, Qt::darkBlue );
-    }
-};
-
-
-
-class HueColorMap: public QwtColorMap
-{
-public:
-    // class backported from Qwt 6.2
-
-    HueColorMap():
-        d_hue1(0),
-        d_hue2(359),
-        d_saturation(150),
-        d_value(200)
-    {
-        updateTable();
-
-    }
-
-    virtual QRgb rgb( const QwtInterval &interval, double value ) const
-    {
-        if ( qIsNaN(value) )
-            return 0u;
-
-        const double width = interval.width();
-        if ( width <= 0 )
-            return 0u;
-
-        if ( value <= interval.minValue() )
-            return d_rgbMin;
-
-        if ( value >= interval.maxValue() )
-            return d_rgbMax;
-
-        const double ratio = ( value - interval.minValue() ) / width;
-        int hue = d_hue1 + qRound( ratio * ( d_hue2 - d_hue1 ) );
-
-        if ( hue >= 360 )
-        {
-            hue -= 360;
-
-            if ( hue >= 360 )
-                hue = hue % 360;
-        }
-
-        return d_rgbTable[hue];
-    }
-
-    virtual unsigned char colorIndex( const QwtInterval &, double ) const
-    {
-        // we don't support indexed colors
-        return 0;
-    }
-
-
-private:
-    void updateTable()
-    {
-        for ( int i = 0; i < 360; i++ )
-            d_rgbTable[i] = QColor::fromHsv( i, d_saturation, d_value ).rgb();
-
-        d_rgbMin = d_rgbTable[ d_hue1 % 360 ];
-        d_rgbMax = d_rgbTable[ d_hue2 % 360 ];
-    }
-
-    int d_hue1, d_hue2, d_saturation, d_value;
-    QRgb d_rgbMin, d_rgbMax, d_rgbTable[360];
-};
-
-class AlphaColorMap: public QwtAlphaColorMap
-{
-public:
-    AlphaColorMap()
-    {
-        //setColor( QColor("DarkSalmon") );
-        setColor( QColor("SteelBlue") );
-    }
-};
-
-/*class MyPlotMagnifier : public QwtPlotMagnifier {
-    Q_OBJECT
-public:
-    MyPlotMagnifier(QWidget *wgt) : QwtPlotMagnifier(wgt) {
-        setAxisEnabled(Qt::XAxis, true);
-        setAxisEnabled(Qt::YAxis,true);
-        setAxisEnabled(Qt::ZAxis,false);
-    }
-
-signals:
-    void zoomed();
-
-protected:
-    virtual void rescale(double factor) {
-        QwtPlotMagnifier::rescale(factor);
-
-        emit zoomed();
-    }
-};*/
 
 CustomPlotterWidget::CustomPlotterWidget(qint32 _targetID, bool _displayPlot,  QWidget *parent) : QWidget(parent),
     d_alpha(255), dspRefreshRate(200), targetID(_targetID), displayPlot(_displayPlot)
@@ -287,19 +116,19 @@ CustomPlotterWidget::CustomPlotterWidget(qint32 _targetID, bool _displayPlot,  Q
 
     connect( setAntiAlasingComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CustomPlotterWidget::OnSetAntiAlasing);
 
-    m_colorSchemeWidget = new MainColorSchemeWidget(Q_NULLPTR);
-//    connect(m_colorSchemeWidget, &MainColorSchemeWidget::ToChangeScheme, this, &CustomPlotterWidget::OnSchemeChange);
-//    connect(m_colorSchemeWidget, &MainColorSchemeWidget::ToDeleteScheme, this, &CustomPlotterWidget::OnSchemeDelete);
+//    m_colorSchemeWidget = new GradientColorChangerWidget(Q_NULLPTR);
+    //    connect(m_colorSchemeWidget, &MainColorSchemeWidget::ToChangeScheme, this, &CustomPlotterWidget::OnSchemeChange);
+    //    connect(m_colorSchemeWidget, &MainColorSchemeWidget::ToDeleteScheme, this, &CustomPlotterWidget::OnSchemeDelete);
 
     presetComboBox = new QComboBox();
-//    m_colorSchemeWidget->initColorScheme();
+    //    m_colorSchemeWidget->initColorScheme();
     QPushButton *colorSchemeSettingButton = new QPushButton("Настроить");
-    connect(colorSchemeSettingButton, &QPushButton::clicked, [&](){
-        if (m_colorSchemeWidget->isHidden())
-            m_colorSchemeWidget->show();
-        else
-            m_colorSchemeWidget->hide();
-    });
+//    connect(colorSchemeSettingButton, &QPushButton::clicked, [&](){
+//        if (m_colorSchemeWidget->isHidden())
+//            m_colorSchemeWidget->show();
+//        else
+//            m_colorSchemeWidget->hide();
+//    });
     QHBoxLayout *settingButtonLayout = new QHBoxLayout();
     settingButtonLayout->addWidget(presetComboBox);
     settingButtonLayout->addWidget(antiAlasingLabel);
@@ -367,7 +196,7 @@ CustomPlotterWidget::CustomPlotterWidget(qint32 _targetID, bool _displayPlot,  Q
 
 CustomPlotterWidget::~CustomPlotterWidget()
 {
-
+    delete m_colorSchemeWidget;
 
 }
 
@@ -399,6 +228,11 @@ void CustomPlotterWidget::UpdateData(const quint32 &n,const quint32 &m,const qui
 void CustomPlotterWidget::ForceSendColorRangesToScene()
 {
     currentSchemeChanged();
+}
+
+void CustomPlotterWidget::OnChangeGradient(const ColorRanges &range)
+{
+
 }
 
 void CustomPlotterWidget::OnShowContour( bool on )
@@ -664,8 +498,11 @@ void CustomPlotterWidget::sliderOffset()
 void CustomPlotterWidget::timerTimeout()
 {
     if (sliderControl->value() != sliderControl->maximum())
+    {
         sliderControl->setValue(sliderControl->value() + 1);
-    else if (sliderControl->value() == sliderControl->maximum()) {
+    }
+    else
+    {
         sliderControl->setValue(0);
     }
 }
@@ -720,7 +557,7 @@ void CustomPlotterWidget::OnSchemeDelete(QString nameScheme)
     }
 }
 
-void CustomPlotterWidget::SetSliderLimit(quint32 counter)
+void CustomPlotterWidget::OnSetSliderLimit(quint32 counter)
 {
     sliderControl->setMaximum(counter);
 }

@@ -1,5 +1,5 @@
-#ifndef PRESETCOLORWIDGET_H
-#define PRESETCOLORWIDGET_H
+#ifndef UI_COLORSSCHEME_PRESETCOLORWIDGET_H
+#define UI_COLORSSCHEME_PRESETCOLORWIDGET_H
 
 #include <QComboBox>
 #include <QLabel>
@@ -15,7 +15,7 @@ class AllGradientsWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit AllGradientsWidget(ColorSchemePresenter *presenter,const QMargins &margin, QWidget *parent);
+    explicit AllGradientsWidget(QSharedPointer<ColorSchemePresenter> presenter,const QMargins &margin, QWidget *parent);
     ~AllGradientsWidget();
 private:
     void CreateUI(const QMargins &margin);
@@ -27,9 +27,9 @@ private:
 
 Q_SIGNALS:
     void ToAppendGradient();
-    void ToCurrentGradientChanged(const QString &gradientName);
+    void ToChangeGradient(const QString &gradientName, const QVector<QColor> &colors, const QVector<int> &ranges);
 public Q_SLOTS:
-    void OnRepaintComboBox();
+    void OnUpdateGradient();
 private Q_SLOTS:
     void OnDeleteScheme();
     void OnComboBoxItemChangedByUser(int index);
@@ -46,11 +46,11 @@ private:
     QPushButton *m_delButton;
 
 private:
-    ColorSchemePresenter *m_presenter;
+    QSharedPointer<ColorSchemePresenter> m_presenter;
 
     const QSize m_pixmapSize=QSize(100,14);
 
 
 };
 
-#endif // PRESETCOLORWIDGET_H
+#endif // UI_COLORSSCHEME_PRESETCOLORWIDGET_H

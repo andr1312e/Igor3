@@ -2,16 +2,18 @@
 #include <QDebug>
 
 
-RangeSlider::RangeSlider(const QVector<int> &doubleHandlesVector, const QVector<int> &tripleHandlesVector, const QVector<int> &quadrupleHandlesVector, QWidget *parent)
+RangeSlider::RangeSlider(QWidget *parent)
     : QWidget(parent)
-    , m_doubleHandlesVector(doubleHandlesVector)
-    , m_tripleHandlesVector(tripleHandlesVector)
-    , m_quadrupleHandlesVector(quadrupleHandlesVector)
     , m_currentMarkSelected(RangeSliderMarkSelected::FirstMark)
     , m_pointCounts(RangeSliderPointsCount::DoubleHandles)
 {
     setMouseTracking(true);
     SetDefaultRanges(m_pointCounts);
+}
+
+RangeSlider::~RangeSlider()
+{
+
 }
 
 void RangeSlider::paintEvent(QPaintEvent* paintEvent)
@@ -181,13 +183,13 @@ void RangeSlider::SetDefaultRanges(RangeSliderPointsCount count)
     m_pointCounts=count;
     switch (m_pointCounts) {
     case DoubleHandles:
-        m_handlesValue=m_doubleHandlesVector;
+        m_handlesValue=doubleHandlesVector;
         break;
     case TripleHandles:
-        m_handlesValue=m_tripleHandlesVector;
+        m_handlesValue=tripleHandlesVector;
         break;
     case QuadrupleHandles:
-        m_handlesValue=m_quadrupleHandlesVector;
+        m_handlesValue=quadrupleHandlesVector;
         break;
     default:
         qFatal("Недопустимое значение RangeSlider::SetDefaultRanges");

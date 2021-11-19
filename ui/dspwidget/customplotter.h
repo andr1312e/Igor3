@@ -21,8 +21,13 @@
 #include "model/spectrogramdata.h"
 
 #include "ui/colorscheme/maincolorschemewidget.h"
-#include "circlepalette.h"
+#include "ui/dspwidget/circlepalette.h"
 
+#include "ui/dspwidget/spektroPlotter/alphacolormap.h"
+#include "ui/dspwidget/spektroPlotter/huecolormap.h"
+#include "ui/dspwidget/spektroPlotter/linearcolormapindexed.h"
+#include "ui/dspwidget/spektroPlotter/linearcolormaprgb.h"
+#include "ui/dspwidget/spektroPlotter/plotterzoomer.h"
 
 class CustomPlotterWidget : public QWidget
 {
@@ -35,10 +40,11 @@ public:
     void ForceSendColorRangesToScene();
 
 Q_SIGNALS:
-    void ToSetDSPDataOnPlotter(const qint32 target, quint32 pos);
+    void ToSetDSPDataOnPlotter(quint32 targetId, quint32 pos);
     void ToSendColorRangesToScene(const qint32 target, ColorRanges colorRanges);
 
 public Q_SLOTS:
+    void OnChangeGradient(const ColorRanges &range);
     void OnShowContour( bool on );
     void OnShowSpectrogram( bool on );
     void OnSetColorMap( int );
@@ -58,8 +64,8 @@ private Q_SLOTS:
     void sliderOffset();
     void timerTimeout();
 
-public:
-    void SetSliderLimit(quint32 counter);
+public Q_SLOTS:
+    void OnSetSliderLimit(quint32 counter);
 
 private:
     void setItemToPresetComboBox(const quint32 &index, const MapOfColorRanges::iterator &itemOfColorMap);
@@ -74,7 +80,7 @@ private:
     QwtPlotSpectrogram *d_spectrogram;
     SpectrogramData *m_spectogramData;
 
-    MainColorSchemeWidget *m_colorSchemeWidget;
+    GradientColorChangerWidget *m_colorSchemeWidget;
 
     QSlider *sliderControl;
     QPushButton *startStopButton;

@@ -10,21 +10,21 @@
 
 #include "enums/prestoPalette.h"
 
-#include "structs/colorranges.h"
+#include "structs/colorscheme/colorranges.h"
 
 #include "model/colorpoint.h"
 
-#include "ui/colorscheme/gradientlabel.h"
+#include "ui/colorscheme/gradientInfo/gradientlabel.h"
 
 
 
-using ColorsMap = QVector<QPair<float, QColor>>;
+
 
 class CirclePalette : public QWidget
 {
     Q_OBJECT
 public:
-    explicit CirclePalette(QWidget *parent = 0);
+    explicit CirclePalette(QWidget *parent);
     ~CirclePalette();
 
     QWidget *drawnElements;

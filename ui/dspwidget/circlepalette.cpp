@@ -34,8 +34,8 @@ QPoint operator*(const QPoint &x, const QPointF &y)
 }
 
 CirclePalette::CirclePalette(QWidget *parent)
-    : QWidget(parent),
-      defaultPoints({QPoint(80,160), QPoint(250,40), QPoint(420,140), QPoint(410, 260)})
+    : QWidget(parent)
+    , defaultPoints({QPoint(80,160), QPoint(250,40), QPoint(420,140), QPoint(410, 260)})
 {
     isDragging = false;
 
@@ -458,9 +458,9 @@ void CirclePalette::mousePressEvent(QMouseEvent *event)
             //qDebug() << mousePos;
 
             // check for collisions with the points
-            // http://math.stackexchange.com/questions/198764/how-to-know-if-a-point-is-inside-a-circle            
+            // http://math.stackexchange.com/questions/198764/how-to-know-if-a-point-is-inside-a-circle
             for (auto cp : *this->points)
-            {                
+            {
                 QPoint *p = &cp->point;
                 if (_is_collision(*p, primaryRadius, mousePos))
                 {
@@ -472,7 +472,7 @@ void CirclePalette::mousePressEvent(QMouseEvent *event)
                     //qDebug() << "Draging enable";
                     return;
                 }
-            }            
+            }
         }
 
         this->drawnElements->repaint();

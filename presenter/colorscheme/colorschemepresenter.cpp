@@ -13,7 +13,7 @@ ColorSchemePresenter::~ColorSchemePresenter()
     SavePresetToFile();
 }
 
-const QList<QString> ColorSchemePresenter::GetAllColorNames()
+const QList<QString> ColorSchemePresenter::GetAllGradientsNames()
 {
     return m_mapOfColorRanges.keys();
 }
@@ -54,6 +54,18 @@ const QVector<QPoint> ColorSchemePresenter::GetPoints(const QString &gradientNam
     }
 }
 
+const ColorRanges &ColorSchemePresenter::GetColorRanges(const QString &gradientName)
+{
+    if (m_mapOfColorRanges.contains(gradientName))
+    {
+        return m_mapOfColorRanges[gradientName];
+    }
+    else
+    {
+        qFatal("ColorChemePresenter::GetPoints Ключа нет");
+    }
+}
+
 void ColorSchemePresenter::DeleteGradientByName(const QString &gradientName)
 {
     if (m_mapOfColorRanges.contains(gradientName))
@@ -68,8 +80,8 @@ void ColorSchemePresenter::DeleteGradientByName(const QString &gradientName)
 
 void ColorSchemePresenter::SaveGradient(const QString &gradientName, const QVector<int> &ranges, const QVector<QColor> &colors)
 {
-        m_mapOfColorRanges[gradientName].rangesForRangeSlider=ranges;
-        m_mapOfColorRanges[gradientName].colorsForGradientLabel=colors;
+    m_mapOfColorRanges[gradientName].rangesForRangeSlider=ranges;
+    m_mapOfColorRanges[gradientName].colorsForGradientLabel=colors;
 }
 
 void ColorSchemePresenter::OnSchemeEdit(const QString &gradientName, ColorRanges &range)
@@ -95,7 +107,8 @@ void ColorSchemePresenter::GetPresetFromFile()
         {
             QStringList gradientsNameList;
             ParseJsonDocument(json, gradientsNameList);
-            Q_EMIT ToChangeScheme(gradientsNameList.last(), m_mapOfColorRanges[gradientsNameList.last()]);
+            auto colors=m_mapOfColorRanges[gradientsNameList.last()].colorsForGradientLabel;
+            auto ranges=m_mapOfColorRanges[gradientsNameList.last()].rangesForRangeSlider;
         }
         else
         {
@@ -164,27 +177,27 @@ void ColorSchemePresenter::PointAttributeAppedToColorRanges(ColorRanges &ranges,
 }
 
 void ColorSchemePresenter::SavePresetToFile()
-{    QFile settingFile(m_dspSettingFilePath);
-
-     if (!settingFile.open(QIODevice::WriteOnly)) {
-         QMessageBox::critical(nullptr, "ColorChemePresenter::SavePresetToFile - Не можем открыть файл", settingFile.errorString());
-         return;
-     }
-     else
-     {
-         QJsonDocument jsonDocument;
-         QJsonObject globalJsonObject;
-         QJsonArray gradientsArray;
-         for (MapOfColorRanges::const_iterator gradient=m_mapOfColorRanges.cbegin(); gradient!=m_mapOfColorRanges.cend(); ++gradient)
-         {
-             gradientsArray.push_back(GetJsonObjectFromColorRange(gradient.key(), *gradient));
-         }
-         globalJsonObject[m_globalJsonTagName]=gradientsArray;
-         jsonDocument.setObject(globalJsonObject);
-         settingFile.write(jsonDocument.toJson());
-         settingFile.flush();
-         settingFile.close();
-     }
+{
+    QFile settingFile(m_dspSettingFilePath);
+    if (!settingFile.open(QIODevice::WriteOnly)) {
+        QMessageBox::critical(nullptr, "ColorChemePresenter::SavePresetToFile - Не можем открыть файл", settingFile.errorString());
+        return;
+    }
+    else
+    {
+        QJsonDocument jsonDocument;
+        QJsonObject globalJsonObject;
+        QJsonArray gradientsArray;
+        for (MapOfColorRanges::const_iterator gradient=m_mapOfColorRanges.cbegin(); gradient!=m_mapOfColorRanges.cend(); ++gradient)
+        {
+            gradientsArray.push_back(GetJsonObjectFromColorRange(gradient.key(), *gradient));
+        }
+        globalJsonObject[m_globalJsonTagName]=gradientsArray;
+        jsonDocument.setObject(globalJsonObject);
+        settingFile.write(jsonDocument.toJson());
+        settingFile.flush();
+        settingFile.close();
+    }
 }
 
 QJsonObject ColorSchemePresenter::GetJsonObjectFromColorRange(const QString &colorName,const ColorRanges &range)
@@ -192,13 +205,14 @@ QJsonObject ColorSchemePresenter::GetJsonObjectFromColorRange(const QString &col
     QJsonObject gradientObject;
     gradientObject[m_nameJsonTagName]=colorName;
     QJsonArray rangesArray;
-    if (range.rangesForRangeSlider.count()==range.colorsForGradientLabel.count()==range.pointsForCirclePalette.count())
+    if (range.rangesForRangeSlider.count()==range.colorsForGradientLabel.count())
     {
         for (int i=0; i<range.rangesForRangeSlider.count(); i++)
         {
             rangesArray.append(GetJsonObjectFromRangeData(range, i));
         }
         gradientObject[m_rangesJsonTagName]=rangesArray;
+        return gradientObject;
     }
     else
     {
@@ -211,8 +225,8 @@ QJsonObject ColorSchemePresenter::GetJsonObjectFromRangeData(const ColorRanges &
     QJsonObject rangeObject;
     rangeObject[m_rangeTagName]=ranges.rangesForRangeSlider.at(index);
     rangeObject[m_rangeColorTagName]=ranges.colorsForGradientLabel.at(index).name();
-    rangeObject[m_xTagName]=ranges.pointsForCirclePalette.at(index).x();
-    rangeObject[m_yTagName]=ranges.pointsForCirclePalette.at(index).y();
+//    rangeObject[m_xTagName]=ranges.pointsForCirclePalette.at(index).x();
+//    rangeObject[m_yTagName]=ranges.pointsForCirclePalette.at(index).y();
     return rangeObject;
 }
 

@@ -1,5 +1,5 @@
-#ifndef COLORSCHEMEWIDGET_H
-#define COLORSCHEMEWIDGET_H
+#ifndef UI_COLORSSCHEME_COLORSCHEMEWIDGET_H
+#define UI_COLORSSCHEME_COLORSCHEMEWIDGET_H
 
 #include <QComboBox>
 #include <QGroupBox>
@@ -25,28 +25,28 @@
 
 #include "presenter/colorscheme/colorschemepresenter.h"
 
-#include "ui/colorscheme/gradientinfowidget.h"
+#include "ui/colorscheme/gradientInfo/gradientinfowidget.h"
 #include "ui/colorscheme/allgradientswidget.h"
 #include "ui/colorscheme/colorChange/colorchangerwidget.h"
 
-class MainColorSchemeWidget : public QWidget {
+class GradientColorChangerWidget : public QWidget {
     Q_OBJECT
 
 public:
-    explicit MainColorSchemeWidget(QWidget *parent);
-    ~MainColorSchemeWidget();
+    explicit GradientColorChangerWidget(QSharedPointer<ColorSchemePresenter> presenter, QWidget *parent);
+    ~GradientColorChangerWidget();
 private:
     void CreateObjects();
     void CreateUI();
     void InsertWidgetsIntoLayouts();
     void FillUI();
     void ConnectObjects();
-private Q_SLOTS:
-    void OnGradientChange(const QString &gradientName);
+Q_SIGNALS:
+    void ToUpdateGradient();
 private:
 
     const QMargins m_margin;
-    ColorSchemePresenter *m_presenter;
+    QSharedPointer<ColorSchemePresenter> m_presenter;
 
     QHBoxLayout *m_mainLayout;
 
@@ -56,4 +56,4 @@ private:
 
     ColorChangerWidget *m_colorChangeWidget;
 };
-#endif // COLORSCHEMEWIDGET_H
+#endif // UI_COLORSSCHEME_COLORSCHEMEWIDGET_H

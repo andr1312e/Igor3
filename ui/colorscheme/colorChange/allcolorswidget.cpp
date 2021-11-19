@@ -59,11 +59,10 @@ void AllColorsWidget::ConnectObjects()
     }
 }
 
-void AllColorsWidget::OnColorButtonClicked(const int id)
+void AllColorsWidget::OnColorButtonClicked(const int buttonId)
 {
-    SetButtonChecked(id);
-    m_currentIdChecked=id;
-    Q_EMIT ToButtonClicked();
+    SetButtonChecked(buttonId);
+    m_currentIdChecked=buttonId;
 }
 
 void AllColorsWidget::OnSetColorToButton(const QColor &color)
@@ -78,7 +77,7 @@ void AllColorsWidget::OnSetColorToButton(const QColor &color)
     }
 }
 
-void AllColorsWidget::ChangeColors(const QVector<QColor> &colors)
+void AllColorsWidget::SetColors(const QVector<QColor> &colors)
 {
     int colorsCount=colors.count();
     for (int i=0; i<colorsCount; i++)
@@ -86,6 +85,23 @@ void AllColorsWidget::ChangeColors(const QVector<QColor> &colors)
         m_buttonColorsList[i]->setColor(colors.at(i));
     }
     SetToDefault(colorsCount);
+}
+
+const QVector<QColor> AllColorsWidget::GetColors()
+{
+    QVector<QColor> colors;
+    for (ColorPreview* button :m_buttonColorsList)
+    {
+        if(button->isEnabled())
+        {
+           colors.append(button->color());
+        }
+        else
+        {
+            break;
+        }
+    }
+    return colors;
 }
 
 int AllColorsWidget::GetCurrentIndex()

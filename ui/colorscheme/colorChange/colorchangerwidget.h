@@ -1,5 +1,5 @@
-#ifndef COLORCHANGERWIDGET_H
-#define COLORCHANGERWIDGET_H
+#ifndef UI_COLORSSCHEME_COLORCHANGE_COLORCHANGERWIDGET_H
+#define UI_COLORSSCHEME_COLORCHANGE_COLORCHANGERWIDGET_H
 
 #include <QButtonGroup>
 #include <QGroupBox>
@@ -9,6 +9,7 @@
 
 #include "colorCircles/include/QtColorWidgets/color_dialog.hpp"
 
+#include "ui/colorscheme/basiccolors.h"
 #include "ui/colorscheme/colorChange/allcolorswidget.h"
 
 using namespace color_widgets;
@@ -27,9 +28,13 @@ private:
     void ConnectObjects();
 
 Q_SIGNALS:
-    void ToUpdateColors(QVector<QColor> &colors);
-public:
-    void ChangeColors(const QVector<QColor> &colors);
+    void ToUpdateColors(const QVector<QColor> &colors);
+private Q_SLOTS:
+    void OnColorChange(const QColor &color);
+public Q_SLOTS:
+    void OnAppendGradient();
+    void OnChangeGradient(const QString &gradientName, const QVector<QColor> &colors, const QVector<int> &ranges);
+    void OnColorsCountChanged(const int colorCounts);
 private:
     QVBoxLayout *m_mainLayout;
 
@@ -39,10 +44,7 @@ private:
     QVBoxLayout *m_groupBoxLayout;
 
     ColorDialog  *m_colorDialog;
-private:
-    QVector<QColor> m_colors;
-    const int m_maxColorCount;
 
 };
 
-#endif // COLORCHANGERWIDGET_H
+#endif // UI_COLORSSCHEME_COLORCHANGE_COLORCHANGERWIDGET_H

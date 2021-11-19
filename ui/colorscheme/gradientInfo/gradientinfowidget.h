@@ -1,5 +1,5 @@
-#ifndef SPECROINFOWIDGET_H
-#define SPECROINFOWIDGET_H
+#ifndef UI_COLORSSCHEME_GRADIENTINFO_SPECROINFOWIDGET_H
+#define UI_COLORSSCHEME_GRADIENTINFO_SPECROINFOWIDGET_H
 
 #include <QComboBox>
 #include <QGroupBox>
@@ -9,40 +9,34 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-#include "structs/colorranges.h"
+#include "structs/colorscheme/colorranges.h"
 
 #include "presenter/colorscheme/colorschemepresenter.h"
 
-#include "ui/colorscheme/rangeslider.h"
-#include "ui/colorscheme/gradientlabel.h"
+#include "ui/colorscheme/gradientInfo/rangeslider.h"
+#include "ui/colorscheme/gradientInfo/gradientlabel.h"
 
 class GradientInfoWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit GradientInfoWidget(ColorSchemePresenter *presenter, QWidget *parent);
+    explicit GradientInfoWidget(QSharedPointer<ColorSchemePresenter> presenter, QWidget *parent);
     ~GradientInfoWidget();
-    void ChangeGradient(const QString &gradientName, const QVector<QColor> &colors, const QVector<int> &ranges);
 private:
     void CreateUI();
     void InsertWidgetsIntoLayouts();
     void FillUI();
     void ConnectObjects();
 Q_SIGNALS:
-    void ToRepaintComboBox();
+    void ToColorsCountChanged(const int colorsCount);
+    void ToUpdateGradient();
 private Q_SLOTS:
     void OnSaveButtonClick();
     void OnComboBoxPointsCountChange(int indexComboBoxValue);
 public Q_SLOTS:
     void OnAppendGradient();
-
-private:
-    const QVector<int> m_doubleHandlesVector={0, 50};
-    const QVector<int> m_tripleHandlesVector={0, 33, 66};
-    const QVector<int> m_quadrupleHandlesVector={0, 25, 50, 75};
-    const QVector<QColor> m_doubleHandlesColorVector={Qt::red, Qt::yellow};
-    const QVector<QColor> m_tripleHandlesColorVector={Qt::red, Qt::yellow, Qt::green};
-    const QVector<QColor> m_quadrupleHandlesColorVector={Qt::red, Qt::yellow, Qt::green, Qt::blue};
+    void OnChangeGradient(const QString &gradientName, const QVector<QColor> &colors, const QVector<int> &ranges);
+    void OnUpdateColors(const QVector<QColor> &colors);
 
 private:
 
@@ -66,8 +60,8 @@ private:
     QPushButton *m_saveButton;
 
 private:
-    ColorSchemePresenter *m_presenter;
+    QSharedPointer<ColorSchemePresenter> m_presenter;
 
 };
 
-#endif // SPECROINFOWIDGET_H
+#endif // UI_COLORSSCHEME_GRADIENTINFO_SPECROINFOWIDGET_H

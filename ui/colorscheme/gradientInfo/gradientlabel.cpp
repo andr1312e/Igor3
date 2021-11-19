@@ -2,16 +2,8 @@
 #include <QDebug>
 
 
-GradientLabel::GradientLabel(const QVector<int> &doubleHandlesVector, const QVector<int> &tripleHandlesVector, const QVector<int> &quadrupleHandlesVector, const QVector<QColor> &doubleHandlesColorVector, const QVector<QColor> &tripleHandlesColorVector, const QVector<QColor> &quadrupleHandlesColorVector, QWidget *widget)
+GradientLabel::GradientLabel(QWidget *widget)
     : QLabel(widget)
-    , m_doubleHandlesVector(doubleHandlesVector)
-    , m_tripleHandlesVector(tripleHandlesVector)
-    , m_quadrupleHandlesVector(quadrupleHandlesVector)
-    , m_doubleHandlesColorVector(doubleHandlesColorVector)
-    , m_tripleHandlesColorVector(tripleHandlesColorVector)
-    , m_quadrupleHandlesColorVector(quadrupleHandlesColorVector)
-    , colorsVector(tripleHandlesColorVector)
-    , rangesVector(tripleHandlesVector)
 {
     setGeometry(0,0,100,40);
 }
@@ -38,7 +30,7 @@ void GradientLabel::SetRangesAndColors(const QVector<QColor> &colors, const QVec
     update();
 }
 
-void GradientLabel::SetColors(QVector<QColor> &colors)
+void GradientLabel::SetColors(const QVector<QColor> &colors)
 {
     colorsVector=colors;
     update();
@@ -54,16 +46,16 @@ void GradientLabel::SetDefaultRanges(RangeSliderPointsCount count)
 {
     switch (count) {
     case DoubleHandles:
-        colorsVector=m_doubleHandlesColorVector;
-        rangesVector=m_doubleHandlesVector;
+        colorsVector=doubleHandlesColorVector;
+        rangesVector=doubleHandlesVector;
         break;
     case TripleHandles:
-        colorsVector=m_tripleHandlesColorVector;
-        rangesVector=m_tripleHandlesVector;
+        colorsVector=tripleHandlesColorVector;
+        rangesVector=tripleHandlesVector;
         break;
     case QuadrupleHandles:
-        colorsVector=m_quadrupleHandlesColorVector;
-        rangesVector=m_quadrupleHandlesVector;
+        colorsVector=quadrupleHandlesColorVector;
+        rangesVector=quadrupleHandlesVector;
         break;
     default:
         qFatal("Нет такого значения");

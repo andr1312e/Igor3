@@ -4,7 +4,6 @@
 
 ColorChangerWidget::ColorChangerWidget(QWidget *parent)
     : QWidget(parent)
-    , m_maxColorCount(4)
 {
     CreateObjects();
     CreateUI();
@@ -69,12 +68,36 @@ void ColorChangerWidget::OnColorChange(const QColor &color)
     }
     else
     {
-        m_colors.at(index)=color;
-        Q_EMIT ToUpdateColors(m_colors);
+        const QVector<QColor> colors=m_allColorListWidget->GetColors();
+        Q_EMIT ToUpdateColors(colors);
     }
 }
 
-void ColorChangerWidget::ChangeColors(const QVector<QColor> &colors)
+void ColorChangerWidget::OnChangeGradient(const QString &gradientName, const QVector<QColor> &colors, const QVector<int> &ranges)
 {
-    m_allColorListWidget->ChangeColors(colors);
+    Q_UNUSED(gradientName)
+    Q_UNUSED(ranges)
+    m_allColorListWidget->SetColors(colors);
+}
+
+void ColorChangerWidget::OnColorsCountChanged(const int colorCounts)
+{
+    switch (colorCounts) {
+    case 2:
+        m_allColorListWidget->SetColors(doubleHandlesColorVector);
+        break;
+    case 3:
+        m_allColorListWidget->SetColors(tripleHandlesColorVector);
+        break;
+    case 4:
+        m_allColorListWidget->SetColors(quadrupleHandlesColorVector);
+        break;
+    default:
+        Q_UNREACHABLE();
+    }
+}
+
+void ColorChangerWidget::OnAppendGradient()
+{
+    m_allColorListWidget->SetColors(tripleHandlesColorVector);
 }

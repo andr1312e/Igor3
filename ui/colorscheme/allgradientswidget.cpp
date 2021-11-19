@@ -1,10 +1,10 @@
 #include "ui/colorscheme/allgradientswidget.h"
 #include <QDebug>
-AllGradientsWidget::AllGradientsWidget(ColorSchemePresenter *presenter, const QMargins &margin, QWidget *parent)
+AllGradientsWidget::AllGradientsWidget(QSharedPointer<ColorSchemePresenter> presenter, const QMargins &margin, QWidget *parent)
     : QWidget(parent)
     , m_presenter(presenter)
 {
-    CreateUI( margin);
+    CreateUI(margin);
     InsertWidgetsIntoLayouts();
     FillUI();
     ConnectObjects();
@@ -55,15 +55,15 @@ void AllGradientsWidget::FillUI()
 {
     m_savedPreSetLabel->setText("Сохраненные схемы");
 
-    OnRepaintComboBox();
-    m_addButton->setText("Добавить");
-    m_delButton->setText("Удалить");
+    OnUpdateGradient();
+    m_addButton->setText("Добавить схему");
+    m_delButton->setText("Удалить схему");
 }
 
 void AllGradientsWidget::InitComboBoxValues()
 {
     m_preSetComboBox->clear();
-    const QList<QString> gradients=m_presenter->GetAllColorNames();
+    const QList<QString> gradients=m_presenter->GetAllGradientsNames();
     for (const QString &gradient: gradients)
     {
         const QVector<QColor> colors=m_presenter->GetColorVector(gradient);
@@ -96,7 +96,6 @@ void AllGradientsWidget::ConnectObjects()
     connect(m_addButton, &QPushButton::clicked, this, &AllGradientsWidget::ToAppendGradient);
     connect(m_delButton, &QPushButton::clicked, this, &AllGradientsWidget::OnDeleteScheme);
     connect(m_preSetComboBox, QOverload<int>::of(&QComboBox::activated), this, &AllGradientsWidget::OnComboBoxItemChangedByUser);
-
 }
 
 void AllGradientsWidget::OnDeleteScheme()
@@ -109,7 +108,10 @@ void AllGradientsWidget::OnDeleteScheme()
         m_presenter->DeleteGradientByName(currentGradientName);
         if(m_preSetComboBox->count()>0)
         {
-            Q_EMIT ToCurrentGradientChanged(m_preSetComboBox->currentText());
+            QString gradientName=m_preSetComboBox->currentText();
+            auto colors=m_presenter->GetColorVector(gradientName);
+            auto ranges=m_presenter->GetRanges(gradientName);
+            Q_EMIT ToChangeGradient(gradientName, colors, ranges);
         }
         else
         {
@@ -127,7 +129,9 @@ void AllGradientsWidget::OnComboBoxItemChangedByUser(int index)
     if (index<m_preSetComboBox->count())
     {
         QString gradientName=m_preSetComboBox->itemText(index);
-        Q_EMIT ToCurrentGradientChanged(gradientName);
+        auto colors=m_presenter->GetColorVector(gradientName);
+        auto ranges=m_presenter->GetRanges(gradientName);
+        Q_EMIT ToChangeGradient(gradientName, colors, ranges);
     }
     else
     {
@@ -135,7 +139,7 @@ void AllGradientsWidget::OnComboBoxItemChangedByUser(int index)
     }
 }
 
-void AllGradientsWidget::OnRepaintComboBox()
+void AllGradientsWidget::OnUpdateGradient()
 {
     InitComboBoxValues();
 }
