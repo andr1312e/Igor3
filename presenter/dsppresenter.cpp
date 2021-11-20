@@ -85,6 +85,7 @@ void DspPresenter::ReadDspFromFile(const QString &fileName)
         Q_EMIT ToSetSliderLimit((quint32)m_mapOfRawData.count());
 
         CalculateAmplitude();
+        Q_EMIT ToStartMovie();
     }
 }
 

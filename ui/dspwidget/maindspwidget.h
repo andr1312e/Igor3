@@ -11,7 +11,6 @@
 
 #include "ui/dspwidget/topuserpanel.h"
 
-#include "ui/dspwidget/dsphistorywidget.h"
 #include "ui/colorscheme/maincolorschemewidget.h"
 
 class MainDspWidget : public QWidget
@@ -38,7 +37,6 @@ private:
 
     CustomPlotterWidget *m_customPlotterWidget;
 
-    DSPHistoryWidget *m_dspHistoryWidget;
 private:
     DspPresenter *m_presenter;
 

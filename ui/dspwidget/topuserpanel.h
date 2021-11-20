@@ -13,7 +13,6 @@
 #include "presenter/dsppresenter.h"
 #include "presenter/colorscheme/colorschemepresenter.h"
 
-#include "ui/dspwidget/dsphistorywidget.h"
 #include "ui/colorscheme/maincolorschemewidget.h"
 
 class TopUserPanel : public QWidget
@@ -30,8 +29,8 @@ private:
     void RepaintComboBox();
     void ConnectObjects();
 Q_SIGNALS:
+    void ToStartMovie();
     void ToChangeGradient(const ColorRanges &range);
-    void ToShowDspHistoryWidget();
 private Q_SLOTS:
     void OnSelectFileButtonClicked();
     void OnGradrientUpdate();

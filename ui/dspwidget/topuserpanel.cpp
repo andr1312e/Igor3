@@ -73,7 +73,7 @@ void TopUserPanel::FillUI()
 
 void TopUserPanel::ConnectObjects()
 {
-    connect(m_openHistoryButton, &QPushButton::clicked, this, &TopUserPanel::ToShowDspHistoryWidget);
+    connect(m_sdpPresenter, &DspPresenter::ToStartMovie, this, &TopUserPanel::ToStartMovie);
     connect(m_openColorPanelButton, &QPushButton::clicked, m_gradientColorChangerWidget, &GradientColorChangerWidget::show);
     connect(m_selectFileButton, &QPushButton::clicked, this, &TopUserPanel::OnSelectFileButtonClicked);
     connect(m_gradientColorChangerWidget, &GradientColorChangerWidget::ToUpdateGradient, this, &TopUserPanel::OnGradrientUpdate);

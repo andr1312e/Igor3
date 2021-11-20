@@ -19,8 +19,6 @@ MainDspWidget::~MainDspWidget()
     delete m_mainLayout;
 
     delete m_customPlotterWidget;
-
-    delete m_dspHistoryWidget;
 }
 
 void MainDspWidget::CreateObjects()
@@ -35,7 +33,6 @@ void MainDspWidget::CreateUI()
     m_topUserPanel=new TopUserPanel(m_presenter, this);
     m_customPlotterWidget = new CustomPlotterWidget(10, true, this);
 
-    m_dspHistoryWidget=new DSPHistoryWidget(nullptr);
 
 }
 
@@ -53,8 +50,8 @@ void MainDspWidget::FillUI()
 
 void MainDspWidget::ConnectObjects()
 {
-    connect(m_topUserPanel, &TopUserPanel::ToShowDspHistoryWidget, m_dspHistoryWidget, &DSPHistoryWidget::show);
     connect(m_topUserPanel, &TopUserPanel::ToChangeGradient, m_customPlotterWidget, &CustomPlotterWidget::OnChangeGradient);
+    connect(m_topUserPanel, &TopUserPanel::ToStartMovie, m_customPlotterWidget, &CustomPlotterWidget::OnStartMovie);
     connect(m_customPlotterWidget, &CustomPlotterWidget::ToSetDSPDataOnPlotter, this, &MainDspWidget::OnSetDSPDataOnPlotter);
 
     connect(m_presenter, &DspPresenter::ToSetSliderLimit, m_customPlotterWidget, &CustomPlotterWidget::OnSetSliderLimit);

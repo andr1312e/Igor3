@@ -25,9 +25,7 @@ include($$PWD/colorCircles/color_widgets.pri)
 SOURCES += \
         main.cpp \
     presenter/dsppresenter.cpp \
-    ui/dspwidget/circlepalette.cpp \
     ui/dspwidget/customplotter.cpp \
-    model/colorpoint.cpp \
     model/spectrogramdata.cpp \
     presenter/colorscheme/colorschemepresenter.cpp \
     ui/colorscheme/allgradientswidget.cpp \
@@ -43,18 +41,14 @@ SOURCES += \
     ui/dspwidget/spektroPlotter/linearcolormapindexed.cpp \
     ui/dspwidget/spektroPlotter/linearcolormaprgb.cpp \
     ui/dspwidget/spektroPlotter/plotterzoomer.cpp \
-    ui/dspwidget/topuserpanel.cpp \
-    ui/dspwidget/dsphistorywidget.cpp
+    ui/dspwidget/topuserpanel.cpp
 
 HEADERS += \
     enums/colorscheme/rangeslidermarkselected.h \
     enums/colorscheme/rangesliderpointscount.h \
     presenter/dsppresenter.h \
-    ui/dspwidget/circlepalette.h \
     ui/dspwidget/customplotter.h \
     enums/colormap.h \
-    enums/prestoPalette.h \
-    model/colorpoint.h \
     model/spectrogramdata.h \
     presenter/colorscheme/colorschemepresenter.h \
     structs/AmpBlockDSP.h \
@@ -78,8 +72,7 @@ HEADERS += \
     ui/dspwidget/spektroPlotter/linearcolormapindexed.h \
     ui/dspwidget/spektroPlotter/linearcolormaprgb.h \
     ui/dspwidget/spektroPlotter/plotterzoomer.h \
-    ui/dspwidget/topuserpanel.h \
-    ui/dspwidget/dsphistorywidget.h
+    ui/dspwidget/topuserpanel.h
 
 unix {
     LIBS += -L/usr/lib/ -lqwt-qt5 -lqwtmathml-qt5

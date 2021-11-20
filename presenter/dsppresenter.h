@@ -23,6 +23,7 @@ public:
     ~DspPresenter();
 Q_SIGNALS:
     void ToSetSliderLimit(quint32 limit);
+    void ToStartMovie();
     void ToSetDSPDataOnPlotter(quint32 targetId, quint32 counter);
 public:
     void ReadDspFromFile(const QString &fileName);

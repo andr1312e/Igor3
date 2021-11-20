@@ -1,40 +1,64 @@
 #include "customplotter.h"
-#include "math.h"
-#include <QCheckBox>
-#include <QComboBox>
-#include <QGroupBox>
-#include <QHeaderView>
-#include <QLayout>
-#include <QMenu>
-#include <QMouseEvent>
-#include <QPushButton>
-#include <QScrollBar>
-#include <QSlider>
-#include <QSlider>
-#include <QSpinBox>
-#include <QStandardItemModel>
-#include <QTabWidget>
-#include <QTableView>
-#include <QTableWidget>
-#include <QTimer>
-#include <QToolTip>
-#include <QtMath>
-#include <qnumeric.h>
-#include <qwt_color_map.h>
-#include <qwt_plot_layout.h>
-#include <qwt_plot_magnifier.h>
-#include <qwt_plot_panner.h>
-#include <qwt_plot_renderer.h>
-#include <qwt_plot_zoomer.h>
-#include <qwt_scale_draw.h>
 
 quint16 xMaxInterval = 32;
 quint16 yMaxInterval = 2512;
 const quint16 zMaxInterval = 100;
 
 
-CustomPlotterWidget::CustomPlotterWidget(qint32 _targetID, bool _displayPlot,  QWidget *parent) : QWidget(parent),
-    d_alpha(255), dspRefreshRate(200), targetID(_targetID), displayPlot(_displayPlot)
+CustomPlotterWidget::CustomPlotterWidget(qint32 _targetID, bool _displayPlot,  QWidget *parent)
+    : QWidget(parent)
+    , dspRefreshRate(200)
+    , targetID(_targetID)
+    , displayPlot(_displayPlot)
+{
+    CreateObjects();
+    CreateUI();
+    InitWindowsTitle();
+    InsertWidgetsIntoLayouts();
+    FillUI();
+    CreateBehavoirObjects();
+    InitBehavoirObjects();
+    ConnectObjects();
+}
+
+CustomPlotterWidget::~CustomPlotterWidget()
+{
+//    delete m_spectogramData;
+//    d_spectrogram;delete
+
+
+    delete updatePlot;
+    delete m_zoomer;
+    delete m_panner;
+    delete sliderControl;
+    delete startStopButton;
+
+
+
+    delete m_qwtPlot;
+
+    delete m_colorSchemeWidget;
+
+}
+
+void CustomPlotterWidget::CreateObjects()
+{
+    m_spectogramData = new SpectrogramData();
+    updatePlot = new QTimer(this);
+}
+
+void CustomPlotterWidget::CreateUI()
+{
+    m_qwtPlot = new QwtPlot();
+    d_spectrogram = new QwtPlotSpectrogram();
+
+    m_panner = new QwtPlotPanner( m_qwtPlot->canvas() );
+    sliderControl = new QSlider();
+    startStopButton = new QPushButton("Старт");
+
+}
+
+void CustomPlotterWidget::InitWindowsTitle()
 {
     QString title;
     if (targetID < 0) {
@@ -44,22 +68,34 @@ CustomPlotterWidget::CustomPlotterWidget(qint32 _targetID, bool _displayPlot,  Q
         title = QString("ДСП по трассе №%1 ").arg(targetID);
     }
     setWindowTitle(title);
+}
 
-    m_qwtPlot = new QwtPlot();
+void CustomPlotterWidget::InsertWidgetsIntoLayouts()
+{
+    QHBoxLayout *plotControlsLayout = new QHBoxLayout();
+    plotControlsLayout->addWidget(startStopButton);
+    plotControlsLayout->addWidget(sliderControl);
 
-    d_spectrogram = new QwtPlotSpectrogram();
+    QVBoxLayout *mainLayout = new  QVBoxLayout();
+    mainLayout->addSpacerItem(new QSpacerItem(1, 20, QSizePolicy::Fixed, QSizePolicy::Fixed));
+    if (displayPlot) {
+        mainLayout->addWidget(m_qwtPlot, 1);
+        mainLayout->addLayout(plotControlsLayout);
+    }
+
+    setLayout(mainLayout);
+}
+
+void CustomPlotterWidget::FillUI()
+{
     d_spectrogram->setRenderThreadCount( 1 ); // use system specific thread count
     d_spectrogram->setCachePolicy( QwtPlotRasterItem::PaintCache );
-
-    m_spectogramData = new SpectrogramData();
     d_spectrogram->setData(m_spectogramData);
     d_spectrogram->attach( m_qwtPlot );
 
     const QwtInterval zInterval = d_spectrogram->data()->interval( Qt::ZAxis );
 
-    // A color bar on the right axis
-
-    QwtScaleWidget *rightAxis = m_qwtPlot->axisWidget( QwtPlot::yRight );
+    QwtScaleWidget *rightAxis = m_qwtPlot->axisWidget( QwtPlot::yRight ); // Цветная полоса на правой оси
     rightAxis->setTitle( "Амплитуда" );
     rightAxis->setColorBarEnabled( true );
 
@@ -71,20 +107,7 @@ CustomPlotterWidget::CustomPlotterWidget(qint32 _targetID, bool _displayPlot,  Q
 
     m_qwtPlot->plotLayout()->setAlignCanvasToScales( true );
 
-    OnSetColorMap( ColorMap::RGBMap );
-    QwtPlotZoomer* zoomer = new MyZoomer( m_qwtPlot->canvas() );
-    zoomer->setMousePattern( QwtEventPattern::MouseSelect2,
-                             Qt::RightButton, Qt::ControlModifier );
-    zoomer->setMousePattern( QwtEventPattern::MouseSelect3,
-                             Qt::RightButton );
 
-    connect(zoomer, &QwtPlotZoomer::zoomed, this, &CustomPlotterWidget::OnZoomHandler);
-
-    QwtPlotPanner *panner = new QwtPlotPanner( m_qwtPlot->canvas() );
-    panner->setAxisEnabled( QwtPlot::yRight, false );
-    panner->setMouseButton( Qt::MiddleButton );
-
-    connect(panner, &QwtPlotPanner::panned, this, &CustomPlotterWidget::OnPannerHandler);
 
     // Avoid jumping when labels with more/less digits
     // appear/disappear when scrolling vertically
@@ -93,111 +116,41 @@ CustomPlotterWidget::CustomPlotterWidget(qint32 _targetID, bool _displayPlot,  Q
     QwtScaleDraw *sd = m_qwtPlot->axisScaleDraw( QwtPlot::yLeft );
     sd->setMinimumExtent( fm.width( "5.00" ) );
 
-    const QColor c( Qt::darkBlue );
-    zoomer->setRubberBandPen( c );
-    zoomer->setTrackerPen( c );
 
-    //    QLabel *colorLabel = new QLabel("Цветовая схема");
-
-    //НЕ ИСПОЛЬЗУТЕСЯ????????
-    QComboBox *mapBox = new QComboBox( );
-    mapBox->addItem( "RGB" );
-    mapBox->addItem( "Hue" );
-    mapBox->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
-
-    connect( mapBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CustomPlotterWidget::OnSetColorMap);
-
-    //НЕ ИСПОЛЬЗУТЕСЯ????????
-    QLabel *antiAlasingLabel = new QLabel("Сглаживание");
-    QComboBox *setAntiAlasingComboBox = new QComboBox( );
-    setAntiAlasingComboBox->addItem( "Выкл" );
-    setAntiAlasingComboBox->addItem( "Вкл" );
-    setAntiAlasingComboBox->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
-
-    connect( setAntiAlasingComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CustomPlotterWidget::OnSetAntiAlasing);
-
-//    m_colorSchemeWidget = new GradientColorChangerWidget(Q_NULLPTR);
-    //    connect(m_colorSchemeWidget, &MainColorSchemeWidget::ToChangeScheme, this, &CustomPlotterWidget::OnSchemeChange);
-    //    connect(m_colorSchemeWidget, &MainColorSchemeWidget::ToDeleteScheme, this, &CustomPlotterWidget::OnSchemeDelete);
-
-    presetComboBox = new QComboBox();
-    //    m_colorSchemeWidget->initColorScheme();
-    QPushButton *colorSchemeSettingButton = new QPushButton("Настроить");
-//    connect(colorSchemeSettingButton, &QPushButton::clicked, [&](){
-//        if (m_colorSchemeWidget->isHidden())
-//            m_colorSchemeWidget->show();
-//        else
-//            m_colorSchemeWidget->hide();
-//    });
-    QHBoxLayout *settingButtonLayout = new QHBoxLayout();
-    settingButtonLayout->addWidget(presetComboBox);
-    settingButtonLayout->addWidget(antiAlasingLabel);
-    settingButtonLayout->addWidget(setAntiAlasingComboBox);
-    settingButtonLayout->addStretch(1);
-    settingButtonLayout->addWidget(colorSchemeSettingButton);
-
-    QVBoxLayout *preSetLayout = new QVBoxLayout();
-    //preSetLayout->addWidget(presetComboBox);
-    preSetLayout->addLayout(settingButtonLayout);
-    preSetLayout->addStretch(1);
-
-    QGroupBox *presetColorSchemeGroupBox = new QGroupBox("Цветовая схема");
-    //presetColorSchemeGroupBox->setStyleSheet(groupBoxCSS);
-    presetColorSchemeGroupBox->setLayout(preSetLayout);
-
-    sliderControl = new QSlider();
     sliderControl->setOrientation(Qt::Horizontal);
     sliderControl->setSingleStep(1);
     sliderControl->setPageStep(1);
     sliderControl->setTickPosition(QSlider::TicksBelow);
     sliderControl->setMaximum(100);
-
-    //startStopButton = new BasePushButton(":/Resources/Icon/llfr_ic_seek_start_on.png", ":/Resources/Icon/llfr_ic_play_on.png");
-    //startStopButton->setSelected();
-    startStopButton = new QPushButton("Старт");
-
-    QHBoxLayout *plotControlsLayout = new QHBoxLayout();
-    plotControlsLayout->addWidget(startStopButton);
-    plotControlsLayout->addWidget(sliderControl);
-
-    //QHBoxLayout *circlePaletteLayout = new QHBoxLayout();
-    //circlePaletteLayout->addWidget(paletteListViewer);
-    //circlePaletteLayout->addWidget(circlePalette);
-
-    /*QVBoxLayout *colorSchemeLayout = new QVBoxLayout();
-    colorSchemeLayout->addWidget(presetColorSchemeGroupBox);
-    colorSchemeLayout->addLayout(circlePaletteLayout);
-
-    colorSchemeBox->setLayout(colorSchemeLayout);*/
-
-    QVBoxLayout *mainLayout = new  QVBoxLayout();
-    mainLayout->addSpacerItem(new QSpacerItem(1, 20, QSizePolicy::Fixed, QSizePolicy::Fixed));
-    //mainLayout->addLayout(comboBoxLayout);
-    mainLayout->addWidget(presetColorSchemeGroupBox);
-    //mainLayout->addStretch(1);
-    //mainLayout->addWidget(dspGroupBox);
-    if (displayPlot) {
-        mainLayout->addWidget(m_qwtPlot, 1);
-        mainLayout->addLayout(plotControlsLayout);
-    }
-    //mainLayout->addWidget(table);
-
-    setLayout(mainLayout);
-
-    updatePlot = new QTimer(this);
-    connect(updatePlot, &QTimer::timeout, this, &CustomPlotterWidget::timerTimeout);
-    //updatePlot->start(dspRefreshRate);
-
-    //connect(startStopButton, &BasePushButton::clicked, this, &CustomPlotterWidget::startStopClicked);
-    connect(startStopButton, &QPushButton::clicked, this, &CustomPlotterWidget::startStopClicked);
-    connect(sliderControl, &QSlider::sliderReleased, this, &CustomPlotterWidget::sliderOffset);
-    connect(presetComboBox, QOverload<int>::of(&QComboBox::activated), this, &CustomPlotterWidget::currentSchemeChanged);
 }
 
-CustomPlotterWidget::~CustomPlotterWidget()
+void CustomPlotterWidget::CreateBehavoirObjects()
 {
-    delete m_colorSchemeWidget;
+    m_zoomer = new MyZoomer(m_qwtPlot->canvas()  );
+}
 
+void CustomPlotterWidget::InitBehavoirObjects()
+{
+    m_zoomer->setMousePattern( QwtEventPattern::MouseSelect2,
+                               Qt::RightButton, Qt::ControlModifier );
+    m_zoomer->setMousePattern( QwtEventPattern::MouseSelect3,
+                               Qt::RightButton );
+    m_panner->setAxisEnabled( QwtPlot::yRight, false );
+    m_panner->setMouseButton( Qt::MiddleButton );
+
+    const QColor c( Qt::darkBlue );
+    m_zoomer->setRubberBandPen( c );
+    m_zoomer->setTrackerPen( c );
+
+}
+
+void CustomPlotterWidget::ConnectObjects()
+{
+    connect(m_zoomer, &QwtPlotZoomer::zoomed, this, &CustomPlotterWidget::OnZoomHandler);
+    connect(m_panner, &QwtPlotPanner::panned, this, &CustomPlotterWidget::OnPannerHandler);
+    connect(updatePlot, &QTimer::timeout, this, &CustomPlotterWidget::timerTimeout);
+    connect(startStopButton, &QPushButton::clicked, this, &CustomPlotterWidget::startStopClicked);
+    connect(sliderControl, &QSlider::sliderReleased, this, &CustomPlotterWidget::sliderOffset);
 }
 
 void CustomPlotterWidget::UpdateData(const quint32 &n,const quint32 &m,const quint32 &counter, const QVector<qreal> &vector)
@@ -230,9 +183,14 @@ void CustomPlotterWidget::ForceSendColorRangesToScene()
     currentSchemeChanged();
 }
 
-void CustomPlotterWidget::OnChangeGradient(const ColorRanges &range)
+void CustomPlotterWidget::OnStartMovie()
 {
 
+}
+
+void CustomPlotterWidget::OnChangeGradient(const ColorRanges &range)
+{
+    Q_EMIT ToSendColorRangesToScene(targetID, range);
 }
 
 void CustomPlotterWidget::OnShowContour( bool on )
@@ -250,47 +208,6 @@ void CustomPlotterWidget::OnShowSpectrogram( bool on )
     m_qwtPlot->replot();
 }
 
-void CustomPlotterWidget::OnSetColorMap( int type )
-{
-    QwtScaleWidget *axis = m_qwtPlot->axisWidget( QwtPlot::yRight );
-    const QwtInterval zInterval = d_spectrogram->data()->interval( Qt::ZAxis );
-
-    d_mapType = type;
-
-    int alpha = d_alpha;
-    switch( type )
-    {
-    case ColorMap::HueMap:
-    {
-        d_spectrogram->setColorMap( new HueColorMap() );
-        axis->setColorMap( zInterval, new HueColorMap() );
-        break;
-    }
-    case ColorMap::AlphaMap:
-    {
-        alpha = 255;
-        d_spectrogram->setColorMap( new AlphaColorMap() );
-        axis->setColorMap( zInterval, new AlphaColorMap() );
-        break;
-    }
-    case ColorMap::IndexMap:
-    {
-        d_spectrogram->setColorMap( new LinearColorMapIndexed() );
-        axis->setColorMap( zInterval, new LinearColorMapIndexed() );
-        break;
-    }
-    case ColorMap::RGBMap:
-    default:
-    {
-        d_spectrogram->setColorMap( new LinearColorMapRGB() );
-        axis->setColorMap( zInterval, new LinearColorMapRGB() );
-    }
-    }
-    d_spectrogram->setAlpha( alpha );
-
-    m_qwtPlot->replot();
-}
-
 void CustomPlotterWidget::OnSetColorsMap(const ColorsMap &colors)
 {
     QwtScaleWidget *axis = m_qwtPlot->axisWidget( QwtPlot::yRight );
@@ -302,29 +219,6 @@ void CustomPlotterWidget::OnSetColorsMap(const ColorsMap &colors)
     axis->setColorMap( zInterval, new LinearColorMapRGB(colors) );
 
     m_qwtPlot->replot();
-}
-
-void CustomPlotterWidget::OnSetAlpha( int alpha )
-{
-    // setting an alpha value doesn't make sense in combination
-    // with a color map interpolating the alpha value
-
-    d_alpha = alpha;
-    if ( d_mapType != ColorMap::AlphaMap )
-    {
-        d_spectrogram->setAlpha( alpha );
-        m_qwtPlot->replot();
-    }
-}
-
-void CustomPlotterWidget::OnSetAntiAlasing(int on)
-{
-    if (on) {
-        m_spectogramData->setResampleMode(QwtMatrixRasterData::BilinearInterpolation);
-    }
-    else {
-        m_spectogramData->setResampleMode(QwtMatrixRasterData::NearestNeighbour);
-    }
 }
 
 void CustomPlotterWidget::OnUpdatePlotSlot()
@@ -385,39 +279,46 @@ void CustomPlotterWidget::OnZoomHandler(const QRectF &rect)
 {
     QwtPlotZoomer *zoomer = qobject_cast<QwtPlotZoomer *>(sender());
     //QwtPlot *plot_ptr = panner->plot();
-
-    QRectF correctRect(rect);
+    qDebug()<< "onzoom";
+    QRectF resultRect(rect);
+    qDebug()<< rect;
+    qDebug()<< "r" << rect.right() << " h " << rect.height();
     if (rect.x() < 0) {
-        correctRect.setX(0);
+        resultRect.setX(0);
     }
     else if (rect.x() > (xMaxInterval - 10)) {
-        correctRect.setX(xMaxInterval - 10);
+        resultRect.setX(xMaxInterval - 10);
         if (rect.width() > 10)
-            correctRect.setWidth(10);
+            resultRect.setWidth(10);
     }
     if (rect.y() < 0) {
-        correctRect.setY(0);
+        resultRect.setY(0);
     }
     else if (rect.y() > (yMaxInterval - 10)) {
-        correctRect.setY(yMaxInterval - 10);
+        resultRect.setY(yMaxInterval - 10);
         if (rect.height() > 10)
-            correctRect.setHeight(10);
+            resultRect.setHeight(10);
     }
 
     if (rect.right() > xMaxInterval) {
-        correctRect.setWidth(xMaxInterval - rect.left());
+        resultRect.setWidth(xMaxInterval - rect.left());
     }
 
     if (rect.bottom() > yMaxInterval) {
-        correctRect.setHeight(yMaxInterval - rect.top());
+        resultRect.setHeight(yMaxInterval - rect.top());
     }
 
-    if (correctRect != rect) {
+    if (resultRect != rect) {
         zoomer->zoom(-1);
-        zoomer->zoom(correctRect);
+        zoomer->zoom(resultRect);
 
         m_qwtPlot->replot();
     }
+//    else
+//    {
+//        zoomer->zoom(0);
+//         m_qwtPlot->replot();
+//    }
 
     //qDebug() << rect;
     //qDebug() << zoomer->zoomBase();
@@ -425,38 +326,38 @@ void CustomPlotterWidget::OnZoomHandler(const QRectF &rect)
 
 void CustomPlotterWidget::setItemToPresetComboBox(const quint32 &index, const MapOfColorRanges::iterator &itemOfColorMap)
 {
-    QStandardItemModel *model = qobject_cast<QStandardItemModel *>(presetComboBox->model());
+//    QStandardItemModel *model = qobject_cast<QStandardItemModel *>(presetComboBox->model());
 
-    QSize pixmapSize(100,14);
-    QPixmap pixmap(pixmapSize);
-    pixmap.fill(Qt::transparent);
+//    QSize pixmapSize(100,14);
+//    QPixmap pixmap(pixmapSize);
+//    pixmap.fill(Qt::transparent);
 
-    QPainter painter(&pixmap);
-    QRect r = pixmap.rect();
+//    QPainter painter(&pixmap);
+//    QRect r = pixmap.rect();
 
-    QLinearGradient gradient(r.topLeft(), r.topRight());
-    for (quint16 indexOfArray = 0; indexOfArray != itemOfColorMap.value().colorsForGradientLabel.size(); indexOfArray++){
-        gradient.setColorAt(itemOfColorMap.value().rangesForRangeSlider.at(indexOfArray) / 100.,
-                            itemOfColorMap.value().colorsForGradientLabel.at(indexOfArray));
-    }
+//    QLinearGradient gradient(r.topLeft(), r.topRight());
+//    for (quint16 indexOfArray = 0; indexOfArray != itemOfColorMap.value().colorsForGradientLabel.size(); indexOfArray++){
+//        gradient.setColorAt(itemOfColorMap.value().rangesForRangeSlider.at(indexOfArray) / 100.,
+//                            itemOfColorMap.value().colorsForGradientLabel.at(indexOfArray));
+//    }
 
-    painter.setBrush(QBrush(gradient));
-    painter.fillRect(r, painter.brush());
-    painter.end();
+//    painter.setBrush(QBrush(gradient));
+//    painter.fillRect(r, painter.brush());
+//    painter.end();
 
-    QStandardItem* sItem;
-    if (index >= (quint32)presetComboBox->count()) {
-        sItem = new QStandardItem;
-        model->setItem(model->rowCount(), 0, sItem);
-        sItem = model->item(model->rowCount() - 1);
-    }
-    else {
-        sItem = model->item(index);
-    }
-    sItem->setText(itemOfColorMap.key());
-    sItem->setIcon(QIcon(pixmap));
+//    QStandardItem* sItem;
+//    if (index >= (quint32)presetComboBox->count()) {
+//        sItem = new QStandardItem;
+//        model->setItem(model->rowCount(), 0, sItem);
+//        sItem = model->item(model->rowCount() - 1);
+//    }
+//    else {
+//        sItem = model->item(index);
+//    }
+//    sItem->setText(itemOfColorMap.key());
+//    sItem->setIcon(QIcon(pixmap));
 
-    presetComboBox->setIconSize(pixmapSize);
+//    presetComboBox->setIconSize(pixmapSize);
 }
 
 void CustomPlotterWidget::createColorArray(const ColorRanges &colorRanges)
@@ -509,52 +410,52 @@ void CustomPlotterWidget::timerTimeout()
 
 void CustomPlotterWidget::OnSchemeChange(QString &nameScheme, QString &newNameScheme, QVector<QColor> &colors, QVector<int> &ranges)
 {
-    auto itemOfMap = mapOfColorRanges.find(nameScheme);
-    if (itemOfMap != mapOfColorRanges.end()) {
-        if (nameScheme != newNameScheme) {
-            mapOfColorRanges.erase(itemOfMap);
-            itemOfMap = mapOfColorRanges.insert(newNameScheme, ColorRanges());
-        }
-    }
-    else {
-        itemOfMap = mapOfColorRanges.insert(newNameScheme, ColorRanges());
-    }
-    itemOfMap.value().colorsForGradientLabel = colors;
-    itemOfMap.value().rangesForRangeSlider = ranges;
+//    auto itemOfMap = mapOfColorRanges.find(nameScheme);
+//    if (itemOfMap != mapOfColorRanges.end()) {
+//        if (nameScheme != newNameScheme) {
+//            mapOfColorRanges.erase(itemOfMap);
+//            itemOfMap = mapOfColorRanges.insert(newNameScheme, ColorRanges());
+//        }
+//    }
+//    else {
+//        itemOfMap = mapOfColorRanges.insert(newNameScheme, ColorRanges());
+//    }
+//    itemOfMap.value().colorsForGradientLabel = colors;
+//    itemOfMap.value().rangesForRangeSlider = ranges;
 
 
-    int searchingIndex = presetComboBox->findText(nameScheme),
-            currentIndex = presetComboBox->currentIndex();
-    if (searchingIndex == -1) {
-        setItemToPresetComboBox(presetComboBox->count(), itemOfMap);
-        if (currentIndex == -1) {
-            presetComboBox->setCurrentIndex(0);
-            currentSchemeChanged();
-        }
-    }
-    else {
-        setItemToPresetComboBox(searchingIndex, itemOfMap);
-        if (searchingIndex == currentIndex) {
-            createColorArray(itemOfMap.value());
-        }
-    }
+//    int searchingIndex = presetComboBox->findText(nameScheme),
+//            currentIndex = presetComboBox->currentIndex();
+//    if (searchingIndex == -1) {
+//        setItemToPresetComboBox(presetComboBox->count(), itemOfMap);
+//        if (currentIndex == -1) {
+//            presetComboBox->setCurrentIndex(0);
+//            currentSchemeChanged();
+//        }
+//    }
+//    else {
+//        setItemToPresetComboBox(searchingIndex, itemOfMap);
+//        if (searchingIndex == currentIndex) {
+//            createColorArray(itemOfMap.value());
+//        }
+//    }
 }
 
 void CustomPlotterWidget::OnSchemeDelete(QString nameScheme)
 {
-    auto itemOfMap = mapOfColorRanges.find(nameScheme);
-    if (itemOfMap != mapOfColorRanges.end()) {
-        mapOfColorRanges.erase(itemOfMap);
-    }
+//    auto itemOfMap = mapOfColorRanges.find(nameScheme);
+//    if (itemOfMap != mapOfColorRanges.end()) {
+//        mapOfColorRanges.erase(itemOfMap);
+//    }
 
-    int searchingIndex = presetComboBox->findText(nameScheme);
-    presetComboBox->removeItem(searchingIndex);
+//    int searchingIndex = presetComboBox->findText(nameScheme);
+//    presetComboBox->removeItem(searchingIndex);
 
-    QString currentStr = presetComboBox->currentText();
-    itemOfMap = mapOfColorRanges.find(currentStr);
-    if (itemOfMap != mapOfColorRanges.end()) {
-        createColorArray(itemOfMap.value());
-    }
+//    QString currentStr = presetComboBox->currentText();
+//    itemOfMap = mapOfColorRanges.find(currentStr);
+//    if (itemOfMap != mapOfColorRanges.end()) {
+//        createColorArray(itemOfMap.value());
+//    }
 }
 
 void CustomPlotterWidget::OnSetSliderLimit(quint32 counter)
@@ -565,14 +466,14 @@ void CustomPlotterWidget::OnSetSliderLimit(quint32 counter)
 
 void CustomPlotterWidget::currentSchemeChanged()
 {
-    //QComboBox *cb = qobject_cast<QComboBox*>(sender());
-    QString str = presetComboBox->currentText();
+//    //QComboBox *cb = qobject_cast<QComboBox*>(sender());
+//    QString str = presetComboBox->currentText();
 
-    auto itemOfMap = mapOfColorRanges.find(str);
-    if (itemOfMap != mapOfColorRanges.end()) {
-        createColorArray(itemOfMap.value());
-    }
-    else {
-        qDebug() << "CustomPlotterWidget::currentSchemeChanged - Can't find name of scheme";
-    }
+//    auto itemOfMap = mapOfColorRanges.find(str);
+//    if (itemOfMap != mapOfColorRanges.end()) {
+//        createColorArray(itemOfMap.value());
+//    }
+//    else {
+//        qDebug() << "CustomPlotterWidget::currentSchemeChanged - Can't find name of scheme";
+//    }
 }
