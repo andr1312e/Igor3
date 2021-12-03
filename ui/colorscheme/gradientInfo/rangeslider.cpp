@@ -25,7 +25,7 @@ void RangeSlider::paintEvent(QPaintEvent* paintEvent)
     // Background
     QRect backgroundRect(m_leftRightMargin, (height() - m_sliderBarHeight) / 2, width() - m_leftRightMargin * 2, m_sliderBarHeight);
 
-    QPen pen(Qt::gray, 0.8); // background Rect
+    QPen pen(Qt::gray, 0.8); // фон прямоугольника на заднем плане
     painter.setPen(pen);
     QBrush backgroundBrush(Qt::gray);
     painter.setBrush(backgroundBrush);
@@ -77,7 +77,7 @@ QRect RangeSlider::GetHandleRect(int index) const
 
 void RangeSlider::mousePressEvent(QMouseEvent* mousePressEvent)
 {
-    if(mousePressEvent->buttons() && Qt::LeftButton)
+    if(mousePressEvent->buttons() & Qt::LeftButton)
     {
         qDebug()<< "localPos" << mousePressEvent->localPos();
         float localXCoordinate = mousePressEvent->localPos().x() ;
@@ -102,7 +102,6 @@ void RangeSlider::mouseMoveEvent(QMouseEvent* mouseMoveEvent)
 {
     if(mouseMoveEvent->buttons() & Qt::LeftButton)
     {
-        int counter = 0;
         if (m_currentMarkSelected != NoMarkSelected) {
             float posValue = mouseMoveEvent->localPos().x() ;
 

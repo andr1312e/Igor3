@@ -107,8 +107,6 @@ void ColorSchemePresenter::GetPresetFromFile()
         {
             QStringList gradientsNameList;
             ParseJsonDocument(json, gradientsNameList);
-            auto colors=m_mapOfColorRanges[gradientsNameList.last()].colorsForGradientLabel;
-            auto ranges=m_mapOfColorRanges[gradientsNameList.last()].rangesForRangeSlider;
         }
         else
         {
@@ -225,8 +223,8 @@ QJsonObject ColorSchemePresenter::GetJsonObjectFromRangeData(const ColorRanges &
     QJsonObject rangeObject;
     rangeObject[m_rangeTagName]=ranges.rangesForRangeSlider.at(index);
     rangeObject[m_rangeColorTagName]=ranges.colorsForGradientLabel.at(index).name();
-//    rangeObject[m_xTagName]=ranges.pointsForCirclePalette.at(index).x();
-//    rangeObject[m_yTagName]=ranges.pointsForCirclePalette.at(index).y();
+    //    rangeObject[m_xTagName]=ranges.pointsForCirclePalette.at(index).x();
+    //    rangeObject[m_yTagName]=ranges.pointsForCirclePalette.at(index).y();
     return rangeObject;
 }
 

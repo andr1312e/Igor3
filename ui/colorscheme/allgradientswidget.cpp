@@ -1,10 +1,11 @@
 #include "ui/colorscheme/allgradientswidget.h"
 #include <QDebug>
-AllGradientsWidget::AllGradientsWidget(QSharedPointer<ColorSchemePresenter> presenter, const QMargins &margin, QWidget *parent)
+AllGradientsWidget::AllGradientsWidget(QSharedPointer<ColorSchemePresenter> presenter, QWidget *parent)
     : QWidget(parent)
+    , m_margin(QMargins(10, 0, 15, 0))
     , m_presenter(presenter)
 {
-    CreateUI(margin);
+    CreateUI();
     InsertWidgetsIntoLayouts();
     FillUI();
     ConnectObjects();
@@ -22,18 +23,18 @@ AllGradientsWidget::~AllGradientsWidget()
     delete m_delButton;
 }
 
-void AllGradientsWidget::CreateUI(const QMargins &margin)
+void AllGradientsWidget::CreateUI()
 {
-    m_mainLayout=new QVBoxLayout();
+    m_mainLayout=new QVBoxLayout(this);
 
-    m_savedPreSetLayout = new QVBoxLayout();
-    m_savedPreSetLayout->setContentsMargins(margin);
-    m_savedPreSetLabel=new QLabel();
-    m_preSetComboBox=new QComboBox();
+    m_savedPreSetLayout = new QVBoxLayout(this);
+    m_savedPreSetLayout->setContentsMargins(m_margin);
+    m_savedPreSetLabel=new QLabel(this);
+    m_preSetComboBox=new QComboBox(this);
 
-    m_buttonsLayout= new QHBoxLayout();
-    m_addButton = new QPushButton();
-    m_delButton = new QPushButton();
+    m_buttonsLayout= new QHBoxLayout(this);
+    m_addButton = new QPushButton(this);
+    m_delButton = new QPushButton(this);
 
 }
 
@@ -135,7 +136,7 @@ void AllGradientsWidget::OnComboBoxItemChangedByUser(int index)
     }
     else
     {
-        qFatal("недопустимый индекс");
+        Q_UNREACHABLE();//"недопустимый индекс"
     }
 }
 

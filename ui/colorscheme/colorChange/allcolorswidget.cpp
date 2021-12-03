@@ -21,11 +21,11 @@ AllColorsWidget::~AllColorsWidget()
 
 void AllColorsWidget::CreateUI()
 {
-    m_mainLayout=new QVBoxLayout();
+    m_mainLayout=new QVBoxLayout(this);
 
-    m_mainGroupBox=new QGroupBox();
+    m_mainGroupBox=new QGroupBox(this);
 
-    m_colorsLayout=new QHBoxLayout();
+    m_colorsLayout=new QHBoxLayout(this);
     for (int i=0; i<4; i++)
     {
         m_buttonColorsList.push_back(new ColorPreview(this, i));

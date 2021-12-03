@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>491</width>
+    <width>553</width>
     <height>380</height>
    </rect>
   </property>
@@ -89,7 +89,7 @@
        <item row="6" column="0">
         <widget class="QLabel" name="label_3">
          <property name="text">
-          <string>Синий</string>
+          <string>Оттенок синего</string>
          </property>
         </widget>
        </item>
@@ -133,7 +133,7 @@
        <item row="5" column="0">
         <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>Зеленый</string>
+          <string>Оттенок зеленого</string>
          </property>
         </widget>
        </item>
@@ -147,7 +147,7 @@
        <item row="4" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
-          <string>Красный</string>
+          <string>Оттенок красного</string>
          </property>
         </widget>
        </item>

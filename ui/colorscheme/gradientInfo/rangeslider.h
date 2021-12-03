@@ -25,7 +25,7 @@ public:
     void SetDefaultRanges(RangeSliderPointsCount count);
 
 protected:
-    void paintEvent(QPaintEvent* paintEvent) override;
+    void  paintEvent(QPaintEvent* paintEvent) override;
     void mousePressEvent(QMouseEvent* mousePressEvent) override;
     void mouseMoveEvent(QMouseEvent* mouseMoveEvent) override;
     void mouseReleaseEvent(QMouseEvent* mouseReleaseEvent) override;

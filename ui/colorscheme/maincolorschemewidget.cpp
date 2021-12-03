@@ -2,9 +2,8 @@
 
 
 
-GradientColorChangerWidget::GradientColorChangerWidget(QSharedPointer<ColorSchemePresenter> presenter, QWidget *parent)
+GradientColorChangerWidget::GradientColorChangerWidget(QSharedPointer<ColorSchemePresenter> &presenter, QWidget *parent)
     : QWidget(parent)
-    , m_margin(QMargins(10, 0, 15, 0))
     , m_presenter(presenter)
 {
     CreateObjects();
@@ -31,10 +30,10 @@ void GradientColorChangerWidget::CreateObjects()
 
 void GradientColorChangerWidget::CreateUI()
 {
-    m_mainLayout=new QHBoxLayout();
+    m_mainLayout=new QHBoxLayout(this);
 
-    m_gradientsLayout=new QVBoxLayout();
-    m_allGradientsWidget=new AllGradientsWidget(m_presenter, m_margin, this);
+    m_gradientsLayout=new QVBoxLayout(this);
+    m_allGradientsWidget=new AllGradientsWidget(m_presenter, this);
     m_gradientInfoWidget=new GradientInfoWidget(m_presenter, this);
 
     m_colorChangeWidget=new ColorChangerWidget(this);

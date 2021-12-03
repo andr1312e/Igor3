@@ -1,8 +1,6 @@
 #include "topuserpanel.h"
 
-#include <QFileDialog>
-
-TopUserPanel::TopUserPanel(DspPresenter *presenter, QWidget *parent)
+TopUserPanel::TopUserPanel(QSharedPointer<DspPresenter> &presenter, QWidget *parent)
     : QWidget(parent)
     , m_sdpPresenter(presenter)
 {
@@ -18,9 +16,7 @@ TopUserPanel::~TopUserPanel()
     delete m_buttonsLayout;
     delete m_mainLayout;
 
-
     delete m_selectFileButton;
-    delete m_openHistoryButton;
     delete m_openColorPanelButton;
 
     delete m_gradientsComboBox;
@@ -35,23 +31,22 @@ void TopUserPanel::CreateObjects()
 
 void TopUserPanel::CreateUI()
 {
-    m_mainLayout= new QVBoxLayout();
-    m_buttonsLayout=new QHBoxLayout ();
+    m_mainLayout= new QVBoxLayout(this);
+    m_buttonsLayout=new QHBoxLayout (this);
 
-    m_selectFileButton=new QPushButton();
-    m_openHistoryButton=new QPushButton();
-    m_openColorPanelButton=new QPushButton();
+    m_selectFileButton=new QPushButton(this);
+    m_openColorPanelButton=new QPushButton(this);
 
-    m_label=new QLabel();
-    m_gradientsComboBox=new QComboBox();
+    m_label=new QLabel(this);
+    m_gradientsComboBox=new QComboBox(this);
 
-    m_gradientColorChangerWidget=new GradientColorChangerWidget(m_colorPresenter, nullptr);
+    m_gradientColorChangerWidget=new GradientColorChangerWidget(m_colorPresenter, Q_NULLPTR);
 }
 
 void TopUserPanel::InsertWidgetsIntoLayouts()
 {
     m_buttonsLayout->addWidget(m_selectFileButton);
-    m_buttonsLayout->addWidget(m_openHistoryButton);
+    m_buttonsLayout->addWidget(m_label);
     m_buttonsLayout->addWidget(m_openColorPanelButton);
 
     m_mainLayout->addLayout(m_buttonsLayout);
@@ -63,7 +58,6 @@ void TopUserPanel::InsertWidgetsIntoLayouts()
 void TopUserPanel::FillUI()
 {
     m_selectFileButton->setText("Выберите файл");
-    m_openHistoryButton->setText("Открыть историю ДСП");
     m_openColorPanelButton->setText("Изменить цвета градиентов");
 
     m_label->setText("Файл не загружен");
@@ -73,7 +67,6 @@ void TopUserPanel::FillUI()
 
 void TopUserPanel::ConnectObjects()
 {
-    connect(m_sdpPresenter, &DspPresenter::ToStartMovie, this, &TopUserPanel::ToStartMovie);
     connect(m_openColorPanelButton, &QPushButton::clicked, m_gradientColorChangerWidget, &GradientColorChangerWidget::show);
     connect(m_selectFileButton, &QPushButton::clicked, this, &TopUserPanel::OnSelectFileButtonClicked);
     connect(m_gradientColorChangerWidget, &GradientColorChangerWidget::ToUpdateGradient, this, &TopUserPanel::OnGradrientUpdate);
@@ -82,10 +75,10 @@ void TopUserPanel::ConnectObjects()
 
 void TopUserPanel::OnSelectFileButtonClicked()
 {
-    QString dspFilePath = QFileDialog::getOpenFileName(nullptr, "Open DSP", "~/Project", "*.dsp");
+    QString dspFilePath = QFileDialog::getOpenFileName(nullptr, "Open DSP", QApplication::applicationDirPath(), "*.bin *.dsp");
     if (dspFilePath.isEmpty())
         return;
-    m_label->setText("Файл " + dspFilePath + " загружен");
+    m_label->setText("Файл загружен:\n" + dspFilePath);
     m_sdpPresenter->ReadDspFromFile(dspFilePath);
 }
 

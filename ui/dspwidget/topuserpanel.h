@@ -1,5 +1,5 @@
-#ifndef USERCONTROLWIDGET_H
-#define USERCONTROLWIDGET_H
+#ifndef UI_DSP_WIDGET_TOPUSERPANEL_H
+#define UI_DSP_WIDGET_TOPUSERPANEL_H
 
 #include <QHBoxLayout>
 #include <QWidget>
@@ -7,6 +7,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QSharedDataPointer>
+#include <QFileDialog>
 
 #include "structs/colorscheme/colorranges.h"
 
@@ -19,7 +20,7 @@ class TopUserPanel : public QWidget
 {
     Q_OBJECT
 public:
-    explicit TopUserPanel(DspPresenter *presenter, QWidget *parent);
+    explicit TopUserPanel(QSharedPointer<DspPresenter> &presenter, QWidget *parent);
     ~TopUserPanel();
 private:
     void CreateObjects();
@@ -29,7 +30,6 @@ private:
     void RepaintComboBox();
     void ConnectObjects();
 Q_SIGNALS:
-    void ToStartMovie();
     void ToChangeGradient(const ColorRanges &range);
 private Q_SLOTS:
     void OnSelectFileButtonClicked();
@@ -42,7 +42,6 @@ private:
     QHBoxLayout *m_buttonsLayout;
 
     QPushButton *m_selectFileButton;
-    QPushButton *m_openHistoryButton;
     QPushButton *m_openColorPanelButton;
 
     QLabel *m_label;
@@ -51,9 +50,9 @@ private:
     GradientColorChangerWidget *m_gradientColorChangerWidget;
 
 private:
-    DspPresenter *m_sdpPresenter;
+    QSharedPointer<DspPresenter> m_sdpPresenter;
     QSharedPointer<ColorSchemePresenter> m_colorPresenter;
     const QSize m_pixmapSize=QSize(100,14);
 };
 
-#endif // USERCONTROLWIDGET_H
+#endif // UI_DSP_WIDGET_TOPUSERPANEL_H

@@ -1,6 +1,7 @@
 #ifndef CUSTOMPLOTTER_H
 #define CUSTOMPLOTTER_H
 
+#include <QComboBox>
 #include <QWidget>
 
 #include <QStyledItemDelegate>
@@ -11,124 +12,89 @@
 #include <qwt_scale_widget.h>
 #include <QSet>
 #include <fftw3.h>
-#include <QComboBox>
-#include <QPushButton>
-#include <QTableView>
-#include "math.h"
-#include <QCheckBox>
-#include <QComboBox>
-#include <QGroupBox>
-#include <QHeaderView>
-#include <QLayout>
-#include <QMenu>
-#include <QMouseEvent>
-#include <QPushButton>
-#include <QScrollBar>
-#include <QSlider>
-#include <QSlider>
-#include <QSpinBox>
-#include <QStandardItemModel>
-#include <QTabWidget>
-#include <QTableView>
-#include <QTableWidget>
-#include <QTimer>
-#include <QToolTip>
-#include <QtMath>
+#include "ui/dspwidget/spektroPlotter/linearcolormaprgb.h"
+#include "structs/colorscheme/colorranges.h"
+#include "presenter/colorscheme/colorschemepresenter.h"
+#include "ui/dspwidget/spektroPlotter/pointviewer.h"
+#include "model/spectrogramdata.h"
+#include "ui/dspwidget/spektroPlotter/huecolormap.h"
+#include "ui/dspwidget/spektroPlotter/alphacolormap.h"
+#include "ui/dspwidget/spektroPlotter/linearcolormapindexed.h"
 #include <qnumeric.h>
 #include <qwt_color_map.h>
-#include <qwt_plot_layout.h>
-#include <qwt_plot_magnifier.h>
-#include <qwt_plot_panner.h>
-#include <qwt_plot_renderer.h>
-#include <qwt_plot_zoomer.h>
 #include <qwt_scale_draw.h>
-
+#include <qwt_plot_zoomer.h>
+#include <qwt_plot_panner.h>
+#include <qwt_plot_layout.h>
+#include <qwt_plot_renderer.h>
+#include <qwt_plot_magnifier.h>
 #include "enums/colormap.h"
-
-#include "model/spectrogramdata.h"
-
-#include "ui/colorscheme/maincolorschemewidget.h"
-
-#include "ui/dspwidget/spektroPlotter/alphacolormap.h"
-#include "ui/dspwidget/spektroPlotter/huecolormap.h"
-#include "ui/dspwidget/spektroPlotter/linearcolormapindexed.h"
-#include "ui/dspwidget/spektroPlotter/linearcolormaprgb.h"
-#include "ui/dspwidget/spektroPlotter/plotterzoomer.h"
+#include <QTimer>
+#include <QTableView>
+#include <QLayout>
+#include <QTimer>
+#include "math.h"
+#include <QComboBox>
+#include <QGroupBox>
+#include <QTabWidget>
+#include <QTableWidget>
+#include <QTableView>
+#include <QHeaderView>
+#include <QStandardItemModel>
+#include <QScrollBar>
+#include <QSpinBox>
+#include <QSlider>
+#include <QMouseEvent>
+#include <QMenu>
+#include <QCheckBox>
+#include <QToolTip>
+#include <QSlider>
+#include <QtMath>
+#include <QPushButton>
+#include <QLabel>
+#include <QPushButton>
+#include "ui/dspwidget/bottomdspcontrolpanel.h"
 
 class CustomPlotterWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit CustomPlotterWidget(qint32 _targetID, bool _displayPlot, QWidget *parent);
+    explicit CustomPlotterWidget(QWidget *parent);
     ~CustomPlotterWidget();
 private:
     void CreateObjects();
     void CreateUI();
-    void InitWindowsTitle();
     void InsertWidgetsIntoLayouts();
     void FillUI();
     void CreateBehavoirObjects();
     void InitBehavoirObjects();
     void ConnectObjects();
-
-
 Q_SIGNALS:
-    void ToSetDSPDataOnPlotter(quint32 targetId, quint32 pos);
-    void ToSendColorRangesToScene(const qint32 target, const ColorRanges &colorRanges);
-
+    void ToStartTimer();
+    void ToRequestDSPData(int sliderPosition);
+    void ToSetSliderLimit(quint32 counter);
 public Q_SLOTS:
-    void OnStartMovie();
     void OnChangeGradient(const ColorRanges &range);
-    void OnShowContour( bool on );
-    void OnShowSpectrogram( bool on );
-    void OnSetColorsMap(const ColorsMap &colors );
-    void OnSetAlpha( int );
-
-    void OnUpdatePlotSlot();
-    void OnPannerHandler(int dx,int dy);
-    void OnZoomHandler(const QRectF & rect);
-
-    void OnSchemeChange(QString &nameScheme, QString &newNameScheme, QVector<QColor> &colors, QVector<int> &ranges);
-    void OnSchemeDelete(QString nameScheme);
 
 private Q_SLOTS:
-    void startStopClicked();
-    void sliderOffset();
-    void timerTimeout();
-
-public Q_SLOTS:
-    void OnSetSliderLimit(quint32 counter);
-
+    void OnPannerHandler(int dx,int dy);
+    void OnZoomHandler(const QRectF & rect);
 public:
-    void UpdateData(const quint32 &n, const quint32 &m, const quint32 &counter, const QVector<qreal> &vector);
-    void ForceSendColorRangesToScene();
+    void UpdateData(const quint32 &distSamplesNum, const quint32 &TimeSamplesNum, const QVector<qreal> &data);
 private:
-    void setItemToPresetComboBox(const quint32 &index, const MapOfColorRanges::iterator &itemOfColorMap);
-    void createColorArray(const ColorRanges &colorRanges);
-    void currentSchemeChanged();
-
+    const QColor GetMaxContrastColor(const QVector<QColor> &currentSpectorColors);
+    int CalculateColorDistance(const QColor &color, const QVector<QColor> &spectorColors);
+    bool CompareRects(const QRectF &firstRect, const QRectF &secondRect);
 private:
     QwtPlot *m_qwtPlot;
     QwtPlotSpectrogram *d_spectrogram;
     SpectrogramData *m_spectogramData;
-    QwtPlotZoomer *m_zoomer;
-    QwtPlotPanner *m_panner;
+    QwtPlotPanner *m_chartFixer;
+    QwtPlotZoomer *m_pointViewer;
 
-    GradientColorChangerWidget *m_colorSchemeWidget;
 
-    QSlider *sliderControl;
-    QPushButton *startStopButton;
-
-    QTimer *updatePlot;
-
-    MapOfColorRanges mapOfColorRanges;
-
-    int d_mapType;
-    const quint16 dspRefreshRate;
-    const qint32 targetID;
-    const bool displayPlot;
+    BottomDspControlPanel *m_bottomDspControlPanel;
+    const QVarLengthArray<QColor, 9> m_contrastColors;
 };
-
-
 
 #endif // CUSTOMPLOTTER_H

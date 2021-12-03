@@ -11,9 +11,9 @@ public:
 
     ~HueColorMap();
 
-    virtual QRgb rgb( const QwtInterval &interval, double value ) const;
+    virtual QRgb rgb( const QwtInterval &interval, double value ) const override;
 
-    virtual unsigned char colorIndex( const QwtInterval &, double ) const;
+    virtual unsigned char colorIndex( const QwtInterval &, double ) const override;
 
 private:
     void UpdateTable();

@@ -9,7 +9,8 @@ LinearColorMapRGB::LinearColorMapRGB()
 LinearColorMapRGB::LinearColorMapRGB(ColorsMap colorMap)
     : QwtLinearColorMap( colorMap.first().second, colorMap.last().second, QwtColorMap::RGB )
 {
-    for (auto &item : colorMap) {
+    for (QPair<float, QColor> &item : colorMap)
+    {
         addColorStop(item.first, item.second);
     }
     setMode(Mode::ScaledColors);

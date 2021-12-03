@@ -24,11 +24,11 @@ void ColorChangerWidget::CreateObjects()
 
 void ColorChangerWidget::CreateUI()
 {
-    m_mainLayout=new QVBoxLayout();
+    m_mainLayout=new QVBoxLayout(this);
 
-    m_groupBox=new QGroupBox();
+    m_groupBox=new QGroupBox(this);
 
-    m_groupBoxLayout=new QVBoxLayout();
+    m_groupBoxLayout=new QVBoxLayout(this);
     m_allColorListWidget=new AllColorsWidget(this);
 
     m_colorDialog=new ColorDialog(this, Qt::Widget | Qt::CustomizeWindowHint | Qt::WindowTitleHint);

@@ -6,9 +6,12 @@
 
 QT       += core gui widgets
 
+VERSION = 2.4.8
+DEFINES += APP_VERSION=\\\"$$VERSION\\\"
+
 CONFIG += c++latest
-TARGET = DSPViewer
 TEMPLATE = app
+
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -25,6 +28,7 @@ include($$PWD/colorCircles/color_widgets.pri)
 SOURCES += \
         main.cpp \
     presenter/dsppresenter.cpp \
+    ui/dspwidget/bottomdspcontrolpanel.cpp \
     ui/dspwidget/customplotter.cpp \
     model/spectrogramdata.cpp \
     presenter/colorscheme/colorschemepresenter.cpp \
@@ -36,17 +40,18 @@ SOURCES += \
     ui/colorscheme/colorChange/colorchangerwidget.cpp \
     ui/colorscheme/colorChange/allcolorswidget.cpp \
     ui/dspwidget/maindspwidget.cpp \
-    ui/dspwidget/spektroPlotter/alphacolormap.cpp \
     ui/dspwidget/spektroPlotter/huecolormap.cpp \
     ui/dspwidget/spektroPlotter/linearcolormapindexed.cpp \
     ui/dspwidget/spektroPlotter/linearcolormaprgb.cpp \
-    ui/dspwidget/spektroPlotter/plotterzoomer.cpp \
+    ui/dspwidget/spektroPlotter/pointviewer.cpp \
     ui/dspwidget/topuserpanel.cpp
 
 HEADERS += \
     enums/colorscheme/rangeslidermarkselected.h \
     enums/colorscheme/rangesliderpointscount.h \
     presenter/dsppresenter.h \
+    structs/RegFileHeader.h \
+    ui/dspwidget/bottomdspcontrolpanel.h \
     ui/dspwidget/customplotter.h \
     enums/colormap.h \
     model/spectrogramdata.h \
@@ -71,7 +76,7 @@ HEADERS += \
     ui/dspwidget/spektroPlotter/huecolormap.h \
     ui/dspwidget/spektroPlotter/linearcolormapindexed.h \
     ui/dspwidget/spektroPlotter/linearcolormaprgb.h \
-    ui/dspwidget/spektroPlotter/plotterzoomer.h \
+    ui/dspwidget/spektroPlotter/pointviewer.h \
     ui/dspwidget/topuserpanel.h
 
 unix {

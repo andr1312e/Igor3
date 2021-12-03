@@ -56,7 +56,6 @@ void GradientInfoWidget::CreateUI()
 
     m_actionLabel=new QLabel();
     m_saveButton=new QPushButton();
-
 }
 
 void GradientInfoWidget::InsertWidgetsIntoLayouts()

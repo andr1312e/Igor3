@@ -6,7 +6,7 @@ SpectrogramData::SpectrogramData()
     setInterval( Qt::YAxis, QwtInterval( 0, yMaxInterval ) );
     setInterval( Qt::ZAxis, QwtInterval( 0.0, zMaxInterval ) );
 
-    setResampleMode(QwtMatrixRasterData::BilinearInterpolation);
+    setResampleMode(QwtMatrixRasterData::NearestNeighbour);
 
     RefreshMatrix();
 }
@@ -16,9 +16,14 @@ SpectrogramData::SpectrogramData(quint16 xMax, quint16 yMax) {
     setInterval( Qt::YAxis, QwtInterval( -10.0, yMax ) );
     setInterval( Qt::ZAxis, QwtInterval( 0.0, zMaxInterval ) );
 
-    setResampleMode(QwtMatrixRasterData::BilinearInterpolation);
+    setResampleMode(QwtMatrixRasterData::NearestNeighbour);
 
     SetBackground();
+}
+
+SpectrogramData::~SpectrogramData()
+{
+
 }
 
 void SpectrogramData::RefreshMatrix()
@@ -38,7 +43,6 @@ void SpectrogramData::RefreshMatrix()
         x = 10;
         yRightLimit = row;
     }
-    const quint32 sizeOfVector = totalCol * totalRow;//не используется
     for (quint32 currentRow = 0; currentRow < totalRow; currentRow++) {
         for (quint32 currentCol = 0; currentCol < totalCol; currentCol++) {
             if (xLeftLimit <= currentCol && currentCol <= xRightLimit) {
@@ -60,11 +64,11 @@ void SpectrogramData::RefreshMatrix()
     setValueMatrix(zVector, totalCol);
 }
 
-void SpectrogramData::UpdateMatrix(const quint32 &n, const quint32 &m, const QVector<qreal> &vector)
+void SpectrogramData::UpdateMatrix(const quint32 &DistSamplesNum, const quint32 &TimeSamplesNum, const QVector<qreal> &data)
 {
-    setInterval( Qt::XAxis, QwtInterval( -10.0, xMaxInterval ) );
-    setInterval( Qt::YAxis, QwtInterval( -10.0, yMaxInterval ) );
-    setValueMatrix(vector, n);
+    setInterval( Qt::XAxis, QwtInterval( xMinValueAxis, xMaxInterval ) );
+    setInterval( Qt::YAxis, QwtInterval( yMinValueAxis, yMaxInterval ) );
+    setValueMatrix(data, DistSamplesNum);
 }
 
 void SpectrogramData::SetBackground()
@@ -73,4 +77,24 @@ void SpectrogramData::SetBackground()
     QVector<double> zVector(vecSize * vecSize, 0);
 
     setValueMatrix(zVector, vecSize);
+}
+
+quint16 SpectrogramData::GetXMaxAxisValue() const
+{
+    return xMaxInterval;
+}
+
+void SpectrogramData::SetXMaxInterval(const quint16 &value)
+{
+    xMaxInterval = value;
+}
+
+quint16 SpectrogramData::GetYMaxAxisValue() const
+{
+    return yMaxInterval;
+}
+
+void SpectrogramData::SetYMaxInterval(const quint16 &value)
+{
+    yMaxInterval = value;
 }

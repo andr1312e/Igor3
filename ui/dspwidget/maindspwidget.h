@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QtGlobal>
+#include <QSharedPointer>
 
 #include "ui/dspwidget/customplotter.h"
 
@@ -28,7 +30,7 @@ private:
     void ConnectObjects();
 
 private Q_SLOTS:
-    void OnSetDSPDataOnPlotter(quint32 targetId, quint32 counter);
+    void OnRequestDSPData(int frame);
 
 private:
     QVBoxLayout *m_mainLayout;
@@ -38,7 +40,7 @@ private:
     CustomPlotterWidget *m_customPlotterWidget;
 
 private:
-    DspPresenter *m_presenter;
+    QSharedPointer<DspPresenter> m_presenter;
 
 };
 

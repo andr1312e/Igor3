@@ -33,7 +33,7 @@ class GradientColorChangerWidget : public QWidget {
     Q_OBJECT
 
 public:
-    explicit GradientColorChangerWidget(QSharedPointer<ColorSchemePresenter> presenter, QWidget *parent);
+    explicit GradientColorChangerWidget(QSharedPointer<ColorSchemePresenter> &presenter, QWidget *parent);
     ~GradientColorChangerWidget();
 private:
     void CreateObjects();
@@ -45,7 +45,7 @@ Q_SIGNALS:
     void ToUpdateGradient();
 private:
 
-    const QMargins m_margin;
+
     QSharedPointer<ColorSchemePresenter> m_presenter;
 
     QHBoxLayout *m_mainLayout;

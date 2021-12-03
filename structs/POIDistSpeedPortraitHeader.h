@@ -11,7 +11,7 @@ struct POIDistSpeedPortraitHeader	{							// Заголовок дальност
     int TimeSamplesNum;											// Количество импульсов в луче
     float Sensor_Azm;											// Значение датчика азимута
     float Sensor_Ugm;											// Значение датчика угла места
-    int Value4Rmo;												// Значение для РМО
+    int Value4Rmo;												// Значение для РМО//targetId
     quint32 RayCounter;											// Счетчик лучей ПОИ
     quint8 LaunchMode;											// Номер запуска
     quint8 RayNum_Azm;											// Номер луча по азимуту

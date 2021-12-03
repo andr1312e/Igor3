@@ -15,10 +15,10 @@ class AllGradientsWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit AllGradientsWidget(QSharedPointer<ColorSchemePresenter> presenter,const QMargins &margin, QWidget *parent);
+    explicit AllGradientsWidget(QSharedPointer<ColorSchemePresenter> presenter, QWidget *parent);
     ~AllGradientsWidget();
 private:
-    void CreateUI(const QMargins &margin);
+    void CreateUI();
     void InsertWidgetsIntoLayouts();
     void FillUI();
     void InitComboBoxValues();
@@ -44,6 +44,7 @@ private:
     QHBoxLayout *m_buttonsLayout;
     QPushButton *m_addButton;
     QPushButton *m_delButton;
+    const QMargins m_margin;
 
 private:
     QSharedPointer<ColorSchemePresenter> m_presenter;
