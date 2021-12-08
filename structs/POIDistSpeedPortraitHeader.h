@@ -22,5 +22,24 @@ struct POIDistSpeedPortraitHeader	{							// Заголовок дальност
     quint8 Reserved[1];
 };
 
+//struct POIDistSpeedPortraitHeader	{							// Заголовок дальностно-скоростного портрета
+//    timeval64 sTimeMeasurement;                                 // Время формирования ДСП
+//    int DistSamplesNum;											// Количество дальностных отсчетов
+//    int TimeSamplesNum;											// Количество импульсов в луче
+//    float Sensor_Azm;											// Значение датчика азимута
+//    float Sensor_Ugm;											// Значение датчика угла места
+//    int Value4Rmo;												// Значение для РМО
+//    quint32 RayCounter;											// Счетчик лучей ПОИ
+//    quint8 LaunchMode;											// Номер запуска
+//    quint8 RayNum_Azm;											// Номер луча по азимуту
+//    quint8 RayNum_Ugm;											// Номер луча по углу места
+//    quint8 TotalPartsNum;										// Общее количество передаваемых частей ДСП
+//    quint8 CurrentPartNum;										// Номер передаваемой части ДСП
+//    quint16 TimeSamplesNumInPack;								// Количество импульсов в текущей части ДСП
+//    quint8 workPointNumber;                                     // Номер рабочей точки
+//    quint8 repeatDistNumber;                                    // Номер повторения по дальности
+//    qint8 repeatVrNumber;                                       // Номер повторения по скорости
+//};
+
 
 #endif // POIDISTSPEEDPORTRAITHEADER_H

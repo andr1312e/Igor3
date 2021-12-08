@@ -12,16 +12,29 @@ DspPresenter::~DspPresenter()
 
 }
 
+void DspPresenter::OnTheadConvertToGif()
+{
+    std::forward_list<Magick::Image> listOfMagickImages;
+    ConvertQPixmapListToImageMaigckList(listOfMagickImages);
+    qDebug() << listOfMagickImages.empty();
+    SaveImageFromImageMagickListImages(listOfMagickImages);
+    Q_EMIT ToConverted(true);
+}
+
 void DspPresenter::ReadDspFromFile(const QString &fileName)
 {
 
     if (fileName.isEmpty())
+    {
         return;
+    }
     m_vectorOfData.clear();
     m_mapOfRawData.clear();
+    m_listOfImages.clear();
 
     QFile dspFile(fileName);
-    if (!dspFile.open(QIODevice::ReadOnly)) {
+    if (!dspFile.open(QIODevice::ReadOnly))
+    {
         qDebug() << "DSPWidget::selectFileSlot - Can't open dsp data file";
         return;
     }
@@ -52,9 +65,11 @@ void DspPresenter::ReadDspFromFile(const QString &fileName)
     quint8 id;
     timeval tv1;
 
-    if (isBinFile) {
+    if (isBinFile)
+    {
 
-        struct RegFileHeader {
+        struct RegFileHeader
+        {
             timeval sTimeMeasurement;           // Время начала регистрации в этом файле
             unsigned int partNumber;            // Номер изделия
             unsigned int operatorId;            // Идентификатор оператора
@@ -73,34 +88,43 @@ void DspPresenter::ReadDspFromFile(const QString &fileName)
     QSet<quint8> numberOfBlock;
     bool skipFrame = false;
 
-    while (!in.atEnd()) {
-        if (isBinFile) {
+    while (!in.atEnd())
+    {
+        if (isBinFile)
+        {
             in.readRawData((char *) &tv1, sizeof(timeval));
             in >> size;
             in >> id;
         }
 
-        if (id == 54 || !isBinFile) {
+        if (id == 54 || !isBinFile)
+        {
             POIDistSpeedPortrait msg;
             in.readRawData(reinterpret_cast<char *>(&msg), sizeof(POIDistSpeedPortrait));
             vectorOfPOIDist.append(msg.POI_DSP_Header);
             counter++;
-
             auto numberItem = numberOfBlock.find(msg.POI_DSP_Header.CurrentPartNum);
-            if (numberItem != numberOfBlock.end()) {
-                if (sizeDSPBlock == currentPositionInBlock) {
+            if (numberItem != numberOfBlock.end())
+            {
+                if (sizeDSPBlock == currentPositionInBlock)
+                {
                     m_mapOfRawData.insert(counter, rawBlock);
                 }
-                else {
+                else
+                {
                     if (!skipFrame)
+                    {
                         delete[] rawBlock.data;
+                    }
                 }
                 currentPositionInBlock = 0;
                 numberOfBlock.clear();
-                if (msg.POI_DSP_Header.CurrentPartNum != 0) {
+                if (msg.POI_DSP_Header.CurrentPartNum != 0)
+                {
                     skipFrame = true;
                 }
-                else {
+                else
+                {
                     skipFrame = false;
                     rawBlock.header = msg.POI_DSP_Header;
                     //counter = QDateTime::currentSecsSinceEpoch();
@@ -109,8 +133,10 @@ void DspPresenter::ReadDspFromFile(const QString &fileName)
                     rawBlock.data = new short[sizeDSPBlock];
                 }
             }
-            else {
-                if (msg.POI_DSP_Header.CurrentPartNum == 0) {
+            else
+            {
+                if (msg.POI_DSP_Header.CurrentPartNum == 0)
+                {
                     skipFrame = false;
                     numberOfBlock.clear();
                     currentPositionInBlock = 0;
@@ -121,22 +147,28 @@ void DspPresenter::ReadDspFromFile(const QString &fileName)
                     sizeDSPBlock = 2 * msg.POI_DSP_Header.DistSamplesNum * msg.POI_DSP_Header.TimeSamplesNum;
                     rawBlock.data = new short[sizeDSPBlock];
                 }
-                else {
+                else
+                {
                     if (numberOfBlock.isEmpty())
+                    {
                         skipFrame = true;
+                    }
                 }
             }
             numberOfBlock.insert(msg.POI_DSP_Header.CurrentPartNum);
 
-            if (!skipFrame) {
-                //quint32 currentSizeData = 2 * msg.POI_DSP_Header.TimeSamplesNumInPack; //new version
-                quint32 currentSizeData = 2 * msg.POI_DSP_Header.TimeSamplesNumInPack * msg.POI_DSP_Header.DistSamplesNum;
-                for (quint32 index = 0; index != currentSizeData; index++, currentPositionInBlock++) {
+            if (!skipFrame)
+            {
+                quint32 currentSizeData = 2 * msg.POI_DSP_Header.TimeSamplesNumInPack; //new version
+                //                quint32 currentSizeData = 2 * msg.POI_DSP_Header.TimeSamplesNumInPack * msg.POI_DSP_Header.DistSamplesNum;
+                for (quint32 index = 0; index != currentSizeData; index++, currentPositionInBlock++)
+                {
                     rawBlock.data[currentPositionInBlock] = msg.data[index];
                 }
             }
         }
-        else {
+        else
+        {
             in.skipRawData(size - 1);
         }
 
@@ -144,20 +176,21 @@ void DspPresenter::ReadDspFromFile(const QString &fileName)
 
     };
 
-    if (sizeDSPBlock == currentPositionInBlock) {
-//        if (counter != 0)
+    if (sizeDSPBlock == currentPositionInBlock)
+    {
+        //        if (counter != 0)
         m_mapOfRawData.insert(counter, rawBlock);
     }
-    else {
+    else
+    {
         delete[] rawBlock.data;
     }
     qDebug()<< "кадров" << m_mapOfRawData.size();
-     CalculateAmplitude();
+    m_listOfImages.resize(m_mapOfRawData.count());
+    CalculateAmplitude();
+
+
     Q_EMIT ToSetSliderLimit(m_mapOfRawData.count());
-
-
-
-
 }
 
 //void DspPresenter::ReadDspFromDspFile(const QString &fileName)
@@ -310,9 +343,9 @@ void DspPresenter::ReadDspFromFile(const QString &fileName)
 //    }
 //}
 
-quint32 DspPresenter::GetVectorOfDataElementsCount()
+int DspPresenter::GetVectorOfDataElementsCount()
 {
-    return (quint32)m_vectorOfData.count();
+    return m_vectorOfData.count();
 }
 
 const AmpBlockDSP DspPresenter::GetElementOfData(int elementIndex)
@@ -325,6 +358,42 @@ const AmpBlockDSP DspPresenter::GetElementOfData(int elementIndex)
     {
         Q_UNREACHABLE();
     }
+}
+
+void DspPresenter::ClearImagesList()
+{
+    m_listOfImages.clear();
+}
+
+void DspPresenter::OnAppendImageIntoList(const QImage &image)
+{
+    m_listOfImages.push_front(image);
+}
+
+void DspPresenter::ConvertQPixmapListToImageMaigckList(std::forward_list<Magick::Image> &listOfMagickImages)
+{
+    for(std::forward_list<QImage>::const_iterator it=m_listOfImages.cbegin();it!=m_listOfImages.cend(); ++it)
+    {
+        listOfMagickImages.push_front(*QImageToImage(*it));
+    }
+}
+
+quint64 DspPresenter::GetElapsedTimeOfTwoImages()
+{
+    QElapsedTimer timer;
+    std::forward_list<Magick::Image> copyList;
+    copyList.push_front(*QImageToImage(m_listOfImages.front()));
+    copyList.push_front(*QImageToImage(m_listOfImages.front()));
+    timer.start();
+    Magick::writeImages(copyList.begin(), copyList.end(), "temp.gif");
+    return timer.elapsed();
+}
+
+void DspPresenter::SaveImageFromImageMagickListImages(std::forward_list<Magick::Image> &listOfMagickImages)
+{
+    QString gifName=QDateTime::currentDateTime().toString(QStringLiteral("hh-mm-ss"))+".gif";
+    Magick::writeImages(listOfMagickImages.begin(), listOfMagickImages.end(), gifName.toStdString());
+    QDesktopServices::openUrl(QDir::currentPath());
 }
 
 void DspPresenter::CalculateAmplitude()
@@ -372,6 +441,9 @@ void DspPresenter::CalculateAmplitude()
     fftw_destroy_plan(fftwInfo.fftwPlan);
     fftw_free(fftwInfo.complexMatrix);
 
+    POIDistSpeedPortraitHeader poidistspeedportraitheader=m_vectorOfData.first().header;
+    Q_EMIT ToSetTitileInfo(poidistspeedportraitheader.Value4Rmo, poidistspeedportraitheader.Sensor_Azm, poidistspeedportraitheader.Sensor_Ugm);
+
     Q_EMIT ToSetDSPDataOnPlotter(0);
 }
 
@@ -379,9 +451,35 @@ void DspPresenter::ClearRepository()
 {
     m_mapOfRawData.clear();
     m_vectorOfData.clear();
+    m_listOfImages.clear();
 }
 
 qreal DspPresenter::AbsoluteOfComplexValue(qreal &real, qreal &imaginary)
 {
     return qSqrt(real * real + imaginary * imaginary);
+}
+
+Magick::Image *DspPresenter::QImageToImage(const QImage &qimage)
+{
+    const Magick::Geometry geometry(qimage.width(), qimage.height());
+    const Magick::ColorRGB color(0.5, 0.2, 0.3);
+    Magick::Image *newImage= new Magick::Image (geometry, color);
+    double scale = 1.0 / 256.0;
+    newImage->modifyImage();
+    Magick::ColorRGB mgc;
+    for (int y = 0; y < qimage.height(); ++y)
+    {
+        Magick::PixelPacket  *pixels = newImage->setPixels(0, y, newImage->columns(), 1);
+        for (int x = 0; x < qimage.width(); ++x)
+        {
+            QColor pix = qimage.pixel(x, y);
+            mgc.red(scale *pix.red());
+            mgc.green(scale *pix.green());
+            mgc.blue(scale *pix.blue());
+            *pixels++ = mgc;
+        }
+        newImage->syncPixels();
+    }
+    newImage->animationDelay(20);
+    return newImage;
 }

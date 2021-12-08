@@ -92,8 +92,10 @@ void ColorSchemePresenter::OnSchemeEdit(const QString &gradientName, ColorRanges
 void ColorSchemePresenter::GetPresetFromFile()
 {
     QFile settingFile(m_dspSettingFilePath);
-    if (settingFile.exists()) {
-        if (!settingFile.open(QIODevice::ReadOnly)) {
+    if (settingFile.exists())
+    {
+        if (!settingFile.open(QIODevice::ReadOnly))
+        {
             QMessageBox::critical(nullptr, "ColorChemePresenter::GetPresetFromFile - Не можем открыть файл", settingFile.errorString());
             return;
         }
@@ -113,6 +115,18 @@ void ColorSchemePresenter::GetPresetFromFile()
             QMessageBox::critical(nullptr, "ColorChemePresenter::GetPresetFromFile" , "Тэг неверный, должен быть " + m_globalJsonTagName + " или это не массив должны быть тэг:[]");
         }
     }
+    else
+    {
+        SetDefaultColors();
+    }
+}
+
+void ColorSchemePresenter::SetDefaultColors()
+{
+    ColorRanges colorRanges;
+    colorRanges.rangesForRangeSlider={0, 67, 100};
+    colorRanges.colorsForGradientLabel={Qt::green, Qt::blue, Qt::red};
+    m_mapOfColorRanges.insert("Базовый цвет", colorRanges);
 }
 
 void ColorSchemePresenter::ParseJsonDocument(const QJsonObject &array, QStringList &namesList)

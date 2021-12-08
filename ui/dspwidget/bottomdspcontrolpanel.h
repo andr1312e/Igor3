@@ -23,9 +23,9 @@ private:
     void ConnectObjects();
 Q_SIGNALS:
     void ToStopUpdatePlot();
-    void ToRequestDSPData(int sliderPosition);
+    void ToRequestDSPData(int frame);
 public Q_SLOTS:
-    void OnSetSliderLimit(quint32 counter);
+    void OnSetSliderLimit(int counter);
     void OnStartTimer();
 private Q_SLOTS:
     void OnStartStopClicked();
@@ -35,6 +35,8 @@ private Q_SLOTS:
     void OnFrameMinusButtonClicked();
     void OnFramePlusButtonClicked();
     void OnSliderValueChanged(int value);
+public:
+    void SetPageNumForGif(int value);
 private:
     QHBoxLayout *m_mainLayout;
     QLabel *m_frameLabel;

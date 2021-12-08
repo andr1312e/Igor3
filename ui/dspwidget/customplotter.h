@@ -71,8 +71,9 @@ private:
     void ConnectObjects();
 Q_SIGNALS:
     void ToStartTimer();
-    void ToRequestDSPData(int sliderPosition);
-    void ToSetSliderLimit(quint32 counter);
+    void ToRequestDSPData(int frame);
+    void ToSetSliderLimit(int limit);
+
 public Q_SLOTS:
     void OnChangeGradient(const ColorRanges &range);
 
@@ -81,6 +82,7 @@ private Q_SLOTS:
     void OnZoomHandler(const QRectF & rect);
 public:
     void UpdateData(const quint32 &distSamplesNum, const quint32 &TimeSamplesNum, const QVector<qreal> &data);
+    void SetPageNumForGif(int value);
 private:
     const QColor GetMaxContrastColor(const QVector<QColor> &currentSpectorColors);
     int CalculateColorDistance(const QColor &color, const QVector<QColor> &spectorColors);

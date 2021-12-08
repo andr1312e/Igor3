@@ -20,7 +20,7 @@ class TopUserPanel : public QWidget
 {
     Q_OBJECT
 public:
-    explicit TopUserPanel(QSharedPointer<DspPresenter> &presenter, QWidget *parent);
+    explicit TopUserPanel(DspPresenter *presenter, QWidget *parent);
     ~TopUserPanel();
 private:
     void CreateObjects();
@@ -31,26 +31,38 @@ private:
     void ConnectObjects();
 Q_SIGNALS:
     void ToChangeGradient(const ColorRanges &range);
+    void ToSaveIntoGif();
 private Q_SLOTS:
     void OnSelectFileButtonClicked();
     void OnGradrientUpdate();
     void OnComboBoxUpdated(int index);
+public:
+    void SetAdditionalInfo(const float &Sensor_Azm, const float &Sensor_Ugm);
 private:
     void AddGradientToComboBox(const QString &gradientName, const QVector<QColor> &colors, const QVector<int> &ranges);
 private:
     QVBoxLayout *m_mainLayout;
     QHBoxLayout *m_buttonsLayout;
+    QGridLayout *m_labelsLayout;
 
     QPushButton *m_selectFileButton;
     QPushButton *m_openColorPanelButton;
+    QPushButton *m_saveToGifButton;
 
     QLabel *m_label;
+
+    QLabel *m_sensorAzmLabel;
+    QLabel *m_sensorAzmValue;
+
+    QLabel *m_sensorUgmLabel;
+    QLabel *m_sensorUgmValue;
+
     QComboBox *m_gradientsComboBox;
 
     GradientColorChangerWidget *m_gradientColorChangerWidget;
 
 private:
-    QSharedPointer<DspPresenter> m_sdpPresenter;
+    DspPresenter *m_dspPresenter;
     QSharedPointer<ColorSchemePresenter> m_colorPresenter;
     const QSize m_pixmapSize=QSize(100,14);
 };

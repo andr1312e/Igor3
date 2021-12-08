@@ -33,6 +33,7 @@ public Q_SLOTS:
 public:
     void GetPresetFromFile();
 private:
+    void SetDefaultColors();
     void ParseJsonDocument(const QJsonObject &array, QStringList &namesList);
     void NameAttributeAppedToList(QStringList &list, const QJsonObject &object);
     void RangeAttributeAppedToColorRanges(ColorRanges &ranges, const QJsonObject &object);

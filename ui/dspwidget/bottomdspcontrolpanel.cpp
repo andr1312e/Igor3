@@ -66,7 +66,7 @@ void BottomDspControlPanel::FillUI()
 
     m_startStopButton->setText("Старт");
     m_frameLabel->setText("Номер кадра:");
-    m_frameValue->setText("0");
+    m_frameValue->setText("0     ");
     const QStringList comboBoxValues(m_frameSpeed.keys());
     m_speedFrameComboBox->addItems(comboBoxValues);
     m_speedFrameComboBox->setEditable(false);
@@ -87,9 +87,14 @@ void BottomDspControlPanel::ConnectObjects()
     connect(sliderControl, &QSlider::valueChanged, this , &BottomDspControlPanel::OnSliderValueChanged);
 }
 
-void BottomDspControlPanel::OnSetSliderLimit(quint32 counter)
+void BottomDspControlPanel::OnSetSliderLimit(int counter)
 {
     sliderControl->setMaximum(counter);
+}
+
+void BottomDspControlPanel::SetPageNumForGif(int value)
+{
+    m_frameValue->setNum(value);
 }
 
 void BottomDspControlPanel::OnStartTimer()
@@ -163,5 +168,5 @@ void BottomDspControlPanel::OnFramePlusButtonClicked()
 
 void BottomDspControlPanel::OnSliderValueChanged(int value)
 {
-       m_frameValue->setText(QString::number(sliderControl->value()));
+       m_frameValue->setText(QString::number(value));
 }

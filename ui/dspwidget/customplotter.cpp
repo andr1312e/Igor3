@@ -115,8 +115,7 @@ void CustomPlotterWidget::ConnectObjects()
 }
 
 void CustomPlotterWidget::UpdateData(const quint32 &distSamplesNum, const quint32 &timeSamplesNum, const QVector<qreal> &data)
-{
-
+{ 
     if (m_spectogramData->GetXMaxAxisValue() != distSamplesNum || m_spectogramData->GetYMaxAxisValue() != timeSamplesNum)
     {
         m_spectogramData->SetXMaxInterval(distSamplesNum);
@@ -131,6 +130,11 @@ void CustomPlotterWidget::UpdateData(const quint32 &distSamplesNum, const quint3
     d_spectrogram->invalidateCache();
     d_spectrogram->itemChanged();
     m_qwtPlot->replot();
+}
+
+void CustomPlotterWidget::SetPageNumForGif(int value)
+{
+    m_bottomDspControlPanel->SetPageNumForGif(value);
 }
 
 const QColor CustomPlotterWidget::GetMaxContrastColor(const QVector<QColor> &currentSpectorColors)

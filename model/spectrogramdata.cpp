@@ -12,8 +12,8 @@ SpectrogramData::SpectrogramData()
 }
 
 SpectrogramData::SpectrogramData(quint16 xMax, quint16 yMax) {
-    setInterval( Qt::XAxis, QwtInterval( -10.0, xMax ) );
-    setInterval( Qt::YAxis, QwtInterval( -10.0, yMax ) );
+    setInterval( Qt::XAxis, QwtInterval( 0, xMax ) );
+    setInterval( Qt::YAxis, QwtInterval( 0, yMax ) );
     setInterval( Qt::ZAxis, QwtInterval( 0.0, zMaxInterval ) );
 
     setResampleMode(QwtMatrixRasterData::NearestNeighbour);

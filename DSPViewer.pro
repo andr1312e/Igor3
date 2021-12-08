@@ -4,9 +4,9 @@
 #
 #-------------------------------------------------
 
-QT       += core gui widgets
+QT       += core gui widgets concurrent
 
-VERSION = 2.4.8
+VERSION = 2.4.9
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
 CONFIG += c++latest
@@ -49,6 +49,8 @@ SOURCES += \
 HEADERS += \
     enums/colorscheme/rangeslidermarkselected.h \
     enums/colorscheme/rangesliderpointscount.h \
+    enums/dsp/ModeKvants.h \
+    enums/dspmodes.h \
     presenter/dsppresenter.h \
     structs/RegFileHeader.h \
     ui/dspwidget/bottomdspcontrolpanel.h \
@@ -79,8 +81,13 @@ HEADERS += \
     ui/dspwidget/spektroPlotter/pointviewer.h \
     ui/dspwidget/topuserpanel.h
 
+#libmagick++6.q16 dev установи
 unix {
-    LIBS += -L/usr/lib/ -lqwt-qt5 -lqwtmathml-qt5
+    LIBS += -L/usr/lib/ -lqwt-qt5 -lqwtmathml-qt5  -lMagick++-6.Q16 -lMagickCore-6.Q16 -lMagickWand-6.Q16
     LIBS += -L/usr/lib/x86_64-linux-gnu/ -lfreetype -lfftw3
     INCLUDEPATH += /usr/include/qwt headers
+    INCLUDEPATH += /usr/include/ImageMagick-6 headers #"file not found with <angled> include use quotes instead"
+    INCLUDEPATH += /usr/include/x86_64-linux-gnu/ImageMagick-6 headers
+    INCLUDEPATH += /usr/include/ImageMagick-6/wand headers
+    INCLUDEPATH += /usr/include/ImageMagick-6/magick headers
 }

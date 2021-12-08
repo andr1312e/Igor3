@@ -2,11 +2,14 @@
 #define DSPWIDGET_H
 
 #include <QWidget>
+#include <QThread>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QtGlobal>
 #include <QSharedPointer>
-
+#include <QApplication>
+#include <QCursor>
+#include <QtConcurrent/QtConcurrent>
 #include "ui/dspwidget/customplotter.h"
 
 #include "presenter/dsppresenter.h"
@@ -28,10 +31,15 @@ private:
     void InsertWidgetsIntoLayouts();
     void FillUI();
     void ConnectObjects();
-
 private Q_SLOTS:
+    void OnSetTitileInfo(int &dspType, float &sensorAzm, float &sensorUgm);
     void OnRequestDSPData(int frame);
-
+    void OnSetImagesToGif();
+    void OnConverted();
+protected:
+    void timerEvent(QTimerEvent *event) override;
+private:
+    void InitWindowTitle(int dspType);
 private:
     QVBoxLayout *m_mainLayout;
 
@@ -39,8 +47,9 @@ private:
 
     CustomPlotterWidget *m_customPlotterWidget;
 
+    QProgressBar *m_convertingProgressBar;
 private:
-    QSharedPointer<DspPresenter> m_presenter;
+    DspPresenter *m_presenter;
 
 };
 

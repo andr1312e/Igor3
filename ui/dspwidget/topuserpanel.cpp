@@ -1,8 +1,8 @@
 #include "topuserpanel.h"
 
-TopUserPanel::TopUserPanel(QSharedPointer<DspPresenter> &presenter, QWidget *parent)
+TopUserPanel::TopUserPanel(DspPresenter *presenter, QWidget *parent)
     : QWidget(parent)
-    , m_sdpPresenter(presenter)
+    , m_dspPresenter(presenter)
 {
     CreateObjects();
     CreateUI();
@@ -33,11 +33,20 @@ void TopUserPanel::CreateUI()
 {
     m_mainLayout= new QVBoxLayout(this);
     m_buttonsLayout=new QHBoxLayout (this);
+    m_labelsLayout=new QGridLayout(this);
 
     m_selectFileButton=new QPushButton(this);
     m_openColorPanelButton=new QPushButton(this);
+    m_saveToGifButton=new QPushButton(this);
 
     m_label=new QLabel(this);
+
+    m_sensorAzmLabel=new QLabel(this);
+    m_sensorAzmValue=new QLabel(this);
+
+    m_sensorUgmLabel=new QLabel(this);
+    m_sensorUgmValue=new QLabel(this);
+
     m_gradientsComboBox=new QComboBox(this);
 
     m_gradientColorChangerWidget=new GradientColorChangerWidget(m_colorPresenter, Q_NULLPTR);
@@ -45,9 +54,16 @@ void TopUserPanel::CreateUI()
 
 void TopUserPanel::InsertWidgetsIntoLayouts()
 {
+    m_labelsLayout->addWidget(m_sensorAzmLabel, 0, 0);
+    m_labelsLayout->addWidget(m_sensorAzmValue, 0, 1);
+    m_labelsLayout->addWidget(m_sensorUgmLabel, 1, 0);
+    m_labelsLayout->addWidget(m_sensorUgmValue, 1, 1);
+
     m_buttonsLayout->addWidget(m_selectFileButton);
     m_buttonsLayout->addWidget(m_label);
+    m_buttonsLayout->addLayout(m_labelsLayout);
     m_buttonsLayout->addWidget(m_openColorPanelButton);
+    m_buttonsLayout->addWidget(m_saveToGifButton);
 
     m_mainLayout->addLayout(m_buttonsLayout);
     m_mainLayout->addWidget(m_gradientsComboBox);
@@ -60,9 +76,19 @@ void TopUserPanel::FillUI()
     m_selectFileButton->setText("Выберите файл");
     m_openColorPanelButton->setText("Изменить цвета градиентов");
 
+    m_sensorAzmLabel->setText("Азимут:");
+    m_sensorAzmLabel->setToolTip("Угол, отложенный от направления на север по часовой стрелке");
+    m_sensorAzmValue->setText("0");
+
+    m_sensorUgmLabel->setText("Угол места");
+    m_sensorUgmLabel->setToolTip("Угловая высота наблюдаемого объекта");
+    m_sensorUgmValue->setText("0");
+
     m_label->setText("Файл не загружен");
     m_gradientsComboBox->setEditable(false);
     RepaintComboBox();
+
+    m_saveToGifButton->setText("Сохранить в гиф");
 }
 
 void TopUserPanel::ConnectObjects()
@@ -71,6 +97,7 @@ void TopUserPanel::ConnectObjects()
     connect(m_selectFileButton, &QPushButton::clicked, this, &TopUserPanel::OnSelectFileButtonClicked);
     connect(m_gradientColorChangerWidget, &GradientColorChangerWidget::ToUpdateGradient, this, &TopUserPanel::OnGradrientUpdate);
     connect(m_gradientsComboBox, QOverload<int>::of(&QComboBox::activated), this, &TopUserPanel::OnComboBoxUpdated);
+    connect(m_saveToGifButton, &QPushButton::clicked, this, &TopUserPanel::ToSaveIntoGif);
 }
 
 void TopUserPanel::OnSelectFileButtonClicked()
@@ -79,7 +106,7 @@ void TopUserPanel::OnSelectFileButtonClicked()
     if (dspFilePath.isEmpty())
         return;
     m_label->setText("Файл загружен:\n" + dspFilePath);
-    m_sdpPresenter->ReadDspFromFile(dspFilePath);
+    m_dspPresenter->ReadDspFromFile(dspFilePath);
 }
 
 void TopUserPanel::OnGradrientUpdate()
@@ -96,6 +123,12 @@ void TopUserPanel::OnComboBoxUpdated(int index)
     QString gradientName=m_gradientsComboBox->itemText(index);
     const ColorRanges colorRange=m_colorPresenter->GetColorRanges(gradientName);
     Q_EMIT ToChangeGradient(colorRange);
+}
+
+void TopUserPanel::SetAdditionalInfo(const float &Sensor_Azm, const float &Sensor_Ugm)
+{
+    m_sensorAzmValue->setText(QString::number(Sensor_Azm));
+    m_sensorUgmValue->setText(QString::number(Sensor_Ugm));
 }
 
 void TopUserPanel::AddGradientToComboBox(const QString &gradientName, const QVector<QColor> &colors, const QVector<int> &ranges)
