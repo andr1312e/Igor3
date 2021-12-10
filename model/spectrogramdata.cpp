@@ -11,9 +11,9 @@ SpectrogramData::SpectrogramData()
     RefreshMatrix();
 }
 
-SpectrogramData::SpectrogramData(quint16 xMax, quint16 yMax) {
-    setInterval( Qt::XAxis, QwtInterval( 0, xMax ) );
-    setInterval( Qt::YAxis, QwtInterval( 0, yMax ) );
+SpectrogramData::SpectrogramData(int xMin, int yMin, int xMax, int yMax) {
+    setInterval( Qt::XAxis, QwtInterval( xMin, xMax ) );
+    setInterval( Qt::YAxis, QwtInterval( yMin, yMax ) );
     setInterval( Qt::ZAxis, QwtInterval( 0.0, zMaxInterval ) );
 
     setResampleMode(QwtMatrixRasterData::NearestNeighbour);

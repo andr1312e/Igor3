@@ -4,9 +4,9 @@
 
 enum TYPE_MODES // типы режимов // должны быть от 0 до Count_shift-1
 {
-    TYPE_MODE_QM        = 0, // БЗ
-    TYPE_MODE_MM        = 1, // СЗ
-    TYPE_MODE_RM        = 2, // РЗ
+    TYPE_MODE_QM        = 0, // Быстрый Запуск
+    TYPE_MODE_MM        = 1, // Средний Запуск
+    TYPE_MODE_RM        = 2, // Редкий Запускы
     TYPE_MODE_LFM       = 3, // ЛЧМ
     TYPE_MODE_RI_1      = 4, // РИ_1
     TYPE_MODE_RI_2      = 5 // РИ_2

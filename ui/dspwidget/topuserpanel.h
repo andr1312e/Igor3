@@ -12,7 +12,7 @@
 #include "structs/colorscheme/colorranges.h"
 
 #include "presenter/dsppresenter.h"
-#include "presenter/colorscheme/colorschemepresenter.h"
+#include "presenter/colorschemepresenter.h"
 
 #include "ui/colorscheme/maincolorschemewidget.h"
 

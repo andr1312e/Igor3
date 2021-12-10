@@ -23,7 +23,7 @@
 #include <QMessageBox>
 
 
-#include "presenter/colorscheme/colorschemepresenter.h"
+#include "presenter/colorschemepresenter.h"
 
 #include "ui/colorscheme/gradientInfo/gradientinfowidget.h"
 #include "ui/colorscheme/allgradientswidget.h"

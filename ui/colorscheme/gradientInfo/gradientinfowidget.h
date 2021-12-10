@@ -11,7 +11,7 @@
 
 #include "structs/colorscheme/colorranges.h"
 
-#include "presenter/colorscheme/colorschemepresenter.h"
+#include "presenter/colorschemepresenter.h"
 
 #include "ui/colorscheme/gradientInfo/rangeslider.h"
 #include "ui/colorscheme/gradientInfo/gradientlabel.h"

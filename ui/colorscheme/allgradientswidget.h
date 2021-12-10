@@ -9,7 +9,7 @@
 #include <QWidget>
 #include <QPainter>
 
-#include "presenter/colorscheme/colorschemepresenter.h"
+#include "presenter/colorschemepresenter.h"
 
 class AllGradientsWidget : public QWidget
 {

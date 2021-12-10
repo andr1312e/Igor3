@@ -1,5 +1,5 @@
-#ifndef DSPPRESENTER_H
-#define DSPPRESENTER_H
+#ifndef PRESENTER_DSPPRESENTER_H
+#define PRESENTER_DSPPRESENTER_H
 
 #include <list>
 #include <forward_list>
@@ -71,4 +71,4 @@ private:
 
 };
 
-#endif // DSPPRESENTER_H
+#endif // PRESENTER_DSPPRESENTER_H

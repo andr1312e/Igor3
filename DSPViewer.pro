@@ -27,11 +27,11 @@ include($$PWD/colorCircles/color_widgets.pri)
 
 SOURCES += \
         main.cpp \
-    presenter/dsppresenter.cpp \
     ui/dspwidget/bottomdspcontrolpanel.cpp \
     ui/dspwidget/customplotter.cpp \
     model/spectrogramdata.cpp \
-    presenter/colorscheme/colorschemepresenter.cpp \
+    presenter/dsppresenter.cpp \
+    presenter/colorschemepresenter.cpp \
     ui/colorscheme/allgradientswidget.cpp \
     ui/colorscheme/gradientInfo/gradientinfowidget.cpp \
     ui/colorscheme/gradientInfo/gradientlabel.cpp \
@@ -51,13 +51,13 @@ HEADERS += \
     enums/colorscheme/rangesliderpointscount.h \
     enums/dsp/ModeKvants.h \
     enums/dspmodes.h \
-    presenter/dsppresenter.h \
     structs/RegFileHeader.h \
     ui/dspwidget/bottomdspcontrolpanel.h \
     ui/dspwidget/customplotter.h \
     enums/colormap.h \
     model/spectrogramdata.h \
-    presenter/colorscheme/colorschemepresenter.h \
+    presenter/dsppresenter.h \
+    presenter/colorschemepresenter.h \
     structs/AmpBlockDSP.h \
     structs/POIDistSpeedPortrait.h \
     structs/POIDistSpeedPortraitHeader.h \
@@ -81,7 +81,6 @@ HEADERS += \
     ui/dspwidget/spektroPlotter/pointviewer.h \
     ui/dspwidget/topuserpanel.h
 
-#libmagick++6.q16 dev установи
 unix {
     LIBS += -L/usr/lib/ -lqwt-qt5 -lqwtmathml-qt5  -lMagick++-6.Q16 -lMagickCore-6.Q16 -lMagickWand-6.Q16
     LIBS += -L/usr/lib/x86_64-linux-gnu/ -lfreetype -lfftw3

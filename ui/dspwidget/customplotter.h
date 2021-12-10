@@ -14,7 +14,7 @@
 #include <fftw3.h>
 #include "ui/dspwidget/spektroPlotter/linearcolormaprgb.h"
 #include "structs/colorscheme/colorranges.h"
-#include "presenter/colorscheme/colorschemepresenter.h"
+#include "presenter/colorschemepresenter.h"
 #include "ui/dspwidget/spektroPlotter/pointviewer.h"
 #include "model/spectrogramdata.h"
 #include "ui/dspwidget/spektroPlotter/huecolormap.h"

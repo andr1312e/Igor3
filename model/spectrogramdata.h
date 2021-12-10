@@ -11,7 +11,7 @@ class SpectrogramData : public QwtMatrixRasterData {
 
 public:
     SpectrogramData();
-    SpectrogramData(quint16 xMax, quint16 yMax);
+    SpectrogramData(int xMin, int yMin, int xMax, int yMax);
     ~SpectrogramData();
     void RefreshMatrix();
     void UpdateMatrix(const quint32 &n, const quint32 &TimeSamplesNum, const QVector<qreal> &vector);
