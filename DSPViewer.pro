@@ -6,7 +6,7 @@
 
 QT       += core gui widgets concurrent
 
-VERSION = 2.4.9
+VERSION = 2.5.0
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
 CONFIG += c++latest
@@ -27,10 +27,10 @@ include($$PWD/colorCircles/color_widgets.pri)
 
 SOURCES += \
         main.cpp \
+    presenter/dsppresenter.cpp \
     ui/dspwidget/bottomdspcontrolpanel.cpp \
     ui/dspwidget/customplotter.cpp \
     model/spectrogramdata.cpp \
-    presenter/dsppresenter.cpp \
     presenter/colorschemepresenter.cpp \
     ui/colorscheme/allgradientswidget.cpp \
     ui/colorscheme/gradientInfo/gradientinfowidget.cpp \
@@ -49,14 +49,13 @@ SOURCES += \
 HEADERS += \
     enums/colorscheme/rangeslidermarkselected.h \
     enums/colorscheme/rangesliderpointscount.h \
-    enums/dsp/ModeKvants.h \
-    enums/dspmodes.h \
+    enums/dsp/modekvants.h \
+    presenter/dsppresenter.h \
     structs/RegFileHeader.h \
     ui/dspwidget/bottomdspcontrolpanel.h \
     ui/dspwidget/customplotter.h \
     enums/colormap.h \
     model/spectrogramdata.h \
-    presenter/dsppresenter.h \
     presenter/colorschemepresenter.h \
     structs/AmpBlockDSP.h \
     structs/POIDistSpeedPortrait.h \

@@ -10,12 +10,13 @@
 #include <QApplication>
 #include <QCursor>
 #include <QtConcurrent/QtConcurrent>
-#include "ui/dspwidget/customplotter.h"
+
+#include "enums/dsp/modekvants.h"
 
 #include "presenter/dsppresenter.h"
 
 #include "ui/dspwidget/topuserpanel.h"
-
+#include "ui/dspwidget/customplotter.h"
 #include "ui/colorscheme/maincolorschemewidget.h"
 
 class MainDspWidget : public QWidget
@@ -33,7 +34,7 @@ private:
     void ConnectObjects();
 private Q_SLOTS:
     void OnSetTitileInfo(int &dspType, float &sensorAzm, float &sensorUgm);
-    void OnRequestDSPData(int frame);
+    void OnRequestDSPData(int frameIndex);
     void OnSetImagesToGif();
     void OnConverted();
 protected:

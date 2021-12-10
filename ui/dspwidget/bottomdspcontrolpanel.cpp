@@ -138,7 +138,7 @@ void BottomDspControlPanel::OnTimerTimeout()
     else
     {
         sliderControl->setValue(sliderControl->value() + 1);
-        Q_EMIT ToRequestDSPData(sliderControl->value() + 1);
+        Q_EMIT ToRequestDSPData(sliderControl->value());
     }
 }
 

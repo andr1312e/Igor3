@@ -1,7 +1,5 @@
 #include "maindspwidget.h"
 
-
-
 MainDspWidget::MainDspWidget(QWidget *parent)
     : QWidget(parent)
 {
@@ -14,7 +12,6 @@ MainDspWidget::MainDspWidget(QWidget *parent)
 
 MainDspWidget::~MainDspWidget()
 {
-
     delete m_mainLayout;
     delete m_topUserPanel;
     delete m_customPlotterWidget;
@@ -70,13 +67,26 @@ void MainDspWidget::OnSetTitileInfo(int &dspType, float &sensorAzm, float &senso
 
 }
 
-void MainDspWidget::OnRequestDSPData(int frame)
+void MainDspWidget::OnRequestDSPData(int frameIndex)
 {
-    if (frame < m_presenter->GetVectorOfDataElementsCount())
+    Q_ASSERT(frameIndex>=0 && frameIndex<m_presenter->GetDspFramesCount());
+    const AmpBlockDSP &dspFrame = m_presenter->GetDspDataByIndex(frameIndex);
+    qint32 minX, maxX, minY, maxY;
+    if (dspFrame.header.Value4Rmo>=0)
     {
-        const AmpBlockDSP &firstFrame = m_presenter->GetElementOfData(frame);
-        m_customPlotterWidget->UpdateData(firstFrame.header.DistSamplesNum, firstFrame.header.TimeSamplesNum, firstFrame.data);
+        minX=m_presenter->CalculateDistance(2, 3);
+        minY=0;
+        maxX=m_presenter->CalculateDistance(2, 4);// MODE[i].dist - кванты дальности;
+        maxY=0;
     }
+    else
+    {
+        minX=0;
+        minY=0;
+        maxX=dspFrame.header.DistSamplesNum;
+        maxY=dspFrame.header.TimeSamplesNum;
+    }
+    m_customPlotterWidget->UpdateSprectogram(minX, minY, maxX, maxY, dspFrame.data);
 }
 
 void MainDspWidget::OnSetImagesToGif()
@@ -85,15 +95,14 @@ void MainDspWidget::OnSetImagesToGif()
     QApplication::setOverrideCursor(Qt::WaitCursor);
     m_topUserPanel->setDisabled(true);
     m_presenter->ClearImagesList();
-    for (int frame = 0; frame < m_presenter->GetVectorOfDataElementsCount(); ++frame)
+    for (int frame = 0; frame < m_presenter->GetDspFramesCount(); ++frame)
     {
-        const AmpBlockDSP &firstFrame = m_presenter->GetElementOfData(frame);
-        m_customPlotterWidget->UpdateData(firstFrame.header.DistSamplesNum, firstFrame.header.TimeSamplesNum, firstFrame.data);
+        OnRequestDSPData(frame);
         m_customPlotterWidget->SetPageNumForGif(frame);
         m_presenter->OnAppendImageIntoList(m_customPlotterWidget->grab().toImage());
     }
     quint64 timeToConvertTwoImages=m_presenter->GetElapsedTimeOfTwoImages();
-    quint64 timeToConvertAllImages=quint64(qCeil(m_presenter->GetVectorOfDataElementsCount()/2))*timeToConvertTwoImages;
+    quint64 timeToConvertAllImages=quint64(qCeil(m_presenter->GetDspFramesCount()/2))*timeToConvertTwoImages;
     qDebug()<< "timeToConvertTwoImages" << timeToConvertTwoImages << "timeToConvertAllImages" << timeToConvertAllImages;
 
     this->startTimer(timeToConvertAllImages/100, Qt::CoarseTimer);
@@ -109,7 +118,6 @@ void MainDspWidget::OnConverted()
 
 void MainDspWidget::timerEvent(QTimerEvent *event)
 {
-    Q_UNUSED(event);
     if(m_convertingProgressBar->value()<m_convertingProgressBar->maximum()-1)
     {
         m_convertingProgressBar->setValue(m_convertingProgressBar->value()+1);
@@ -126,9 +134,11 @@ void MainDspWidget::InitWindowTitle(int dspType)
     if (dspType>=0)
     {
         this->setWindowTitle(QStringLiteral("Просмотр ДСП. Версия ")+APP_VERSION + " Тип РСП: Трасса, номер трассы: " + QString::number(dspType));
+        m_customPlotterWidget->NameAxisTrassaDsp();
     }
     else
     {
         this->setWindowTitle(QStringLiteral("Просмотр ДСП. Версия ")+APP_VERSION + " Тип ДСП: Сектор, номер сектора: " + QString::number((-1)*dspType));
+        m_customPlotterWidget->NameAxisSektorDsp();
     }
 }

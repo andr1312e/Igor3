@@ -81,8 +81,10 @@ private Q_SLOTS:
     void OnPannerHandler(int dx,int dy);
     void OnZoomHandler(const QRectF & rect);
 public:
-    void UpdateData(const quint32 &distSamplesNum, const quint32 &TimeSamplesNum, const QVector<qreal> &data);
+    void UpdateSprectogram(const qint32 &minX, const qint32 &minY, const qint32 &maxX, const qint32 &maxY, const QVector<qreal> &data);
     void SetPageNumForGif(int value);
+    void NameAxisSektorDsp();
+    void NameAxisTrassaDsp();
 private:
     const QColor GetMaxContrastColor(const QVector<QColor> &currentSpectorColors);
     int CalculateColorDistance(const QColor &color, const QVector<QColor> &spectorColors);

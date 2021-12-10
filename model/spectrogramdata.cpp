@@ -11,16 +11,6 @@ SpectrogramData::SpectrogramData()
     RefreshMatrix();
 }
 
-SpectrogramData::SpectrogramData(int xMin, int yMin, int xMax, int yMax) {
-    setInterval( Qt::XAxis, QwtInterval( xMin, xMax ) );
-    setInterval( Qt::YAxis, QwtInterval( yMin, yMax ) );
-    setInterval( Qt::ZAxis, QwtInterval( 0.0, zMaxInterval ) );
-
-    setResampleMode(QwtMatrixRasterData::NearestNeighbour);
-
-    SetBackground();
-}
-
 SpectrogramData::~SpectrogramData()
 {
 
@@ -28,7 +18,7 @@ SpectrogramData::~SpectrogramData()
 
 void SpectrogramData::RefreshMatrix()
 {
-    static int x = 10;
+    int x = 10;
     int y = x / 2;
     QVector<double> zVector;
     const quint32 col = xMaxInterval, row = yMaxInterval;
@@ -37,23 +27,33 @@ void SpectrogramData::RefreshMatrix()
             totalRow = row + rowAdd;
 
     quint32 step = 3;
-    quint32 xLeftLimit = x - step, xRightLimit = x + step,
-            yLeftLimit = y - step, yRightLimit = y + step;
-    if (yRightLimit > totalRow) {
+    quint32 xLeftLimit = x - step, xRightLimit = x + step;
+    quint32 yLeftLimit = y - step, yRightLimit = y + step;
+
+    if (yRightLimit > totalRow)
+    {
         x = 10;
         yRightLimit = row;
     }
-    for (quint32 currentRow = 0; currentRow < totalRow; currentRow++) {
-        for (quint32 currentCol = 0; currentCol < totalCol; currentCol++) {
-            if (xLeftLimit <= currentCol && currentCol <= xRightLimit) {
-                if (yLeftLimit <= currentRow && currentRow <= yRightLimit) {
+    for (quint32 currentRow = 0; currentRow < totalRow; currentRow++)
+    {
+        for (quint32 currentCol = 0; currentCol < totalCol; currentCol++)
+        {
+            if (xLeftLimit <= currentCol && currentCol <= xRightLimit)
+            {
+                if (yLeftLimit <= currentRow && currentRow <= yRightLimit)
+                {
                     zVector.push_back(100 - (qrand() % 4) * 10);
                 }
                 else
+                {
                     zVector.push_back(10);
+                }
             }
             else
+            {
                 zVector.push_back(10);
+            }
         }
     }
     x++;
@@ -64,11 +64,11 @@ void SpectrogramData::RefreshMatrix()
     setValueMatrix(zVector, totalCol);
 }
 
-void SpectrogramData::UpdateMatrix(const quint32 &DistSamplesNum, const quint32 &TimeSamplesNum, const QVector<qreal> &data)
+void SpectrogramData::UpdateMatrix(const QVector<qreal> &data)
 {
     setInterval( Qt::XAxis, QwtInterval( xMinValueAxis, xMaxInterval ) );
     setInterval( Qt::YAxis, QwtInterval( yMinValueAxis, yMaxInterval ) );
-    setValueMatrix(data, DistSamplesNum);
+    setValueMatrix(data, xMaxInterval);
 }
 
 void SpectrogramData::SetBackground()
@@ -79,22 +79,42 @@ void SpectrogramData::SetBackground()
     setValueMatrix(zVector, vecSize);
 }
 
-quint16 SpectrogramData::GetXMaxAxisValue() const
+qint32 SpectrogramData::GetXMinAxisValue() const
+{
+    return xMinValueAxis;
+}
+
+void SpectrogramData::SetXMinAxisValue(const qint32 &value)
+{
+    xMinValueAxis=value;
+}
+
+qint32 SpectrogramData::GetYMinAxisValue() const
+{
+    return yMinValueAxis;
+}
+
+void SpectrogramData::SetYMinAxisValue(const qint32 &value)
+{
+    yMinValueAxis=value;
+}
+
+qint32 SpectrogramData::GetXMaxAxisValue() const
 {
     return xMaxInterval;
 }
 
-void SpectrogramData::SetXMaxInterval(const quint16 &value)
+void SpectrogramData::SetXMaxInterval(const qint32 &value)
 {
     xMaxInterval = value;
 }
 
-quint16 SpectrogramData::GetYMaxAxisValue() const
+qint32 SpectrogramData::GetYMaxAxisValue() const
 {
     return yMaxInterval;
 }
 
-void SpectrogramData::SetYMaxInterval(const quint16 &value)
+void SpectrogramData::SetYMaxInterval(const qint32 &value)
 {
     yMaxInterval = value;
 }

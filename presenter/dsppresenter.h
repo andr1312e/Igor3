@@ -29,6 +29,7 @@
 #include "structs/AmpBlockDSP.h"
 #include "structs/fftwinfo.h"
 
+#include "enums/dsp/modekvants.h"
 
 using MapOfRawDSPData = QHash<quint32, RawBlockDSP>;
 using VectorOfDSPData = QVector<AmpBlockDSP>;
@@ -52,10 +53,12 @@ public:
     quint64 GetElapsedTimeOfTwoImages();
 
     void ReadDspFromFile(const QString &fileName);
-    int GetVectorOfDataElementsCount();
-    const AmpBlockDSP GetElementOfData(int elementIndex);
+    int GetDspFramesCount();
+    const AmpBlockDSP GetDspDataByIndex(int elementIndex);
     void ClearImagesList();
     void OnAppendImageIntoList(const QImage &image);
+public:
+    qint32 CalculateDistance(int num, int repeatCount);
 private:
     void ConvertQPixmapListToImageMaigckList(std::forward_list<Magick::Image> &listOfMagickImages);
     void SaveImageFromImageMagickListImages(std::forward_list<Magick::Image> &listOfMagickImages);

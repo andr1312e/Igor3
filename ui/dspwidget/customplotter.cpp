@@ -44,8 +44,6 @@ void CustomPlotterWidget::CreateUI()
 
 void CustomPlotterWidget::InsertWidgetsIntoLayouts()
 {
-
-
     QVBoxLayout *mainLayout = new  QVBoxLayout();
     mainLayout->addSpacerItem(new QSpacerItem(1, 20, QSizePolicy::Fixed, QSizePolicy::Fixed));
     mainLayout->addWidget(m_qwtPlot, 1);
@@ -61,11 +59,6 @@ void CustomPlotterWidget::FillUI()
     d_spectrogram->setData(m_spectogramData);
     d_spectrogram->attach(m_qwtPlot);
 
-    QwtScaleWidget *distanceAxis = m_qwtPlot->axisWidget( QwtPlot::xBottom );//устанавливаем подписи к спектограмме
-    distanceAxis->setTitle("Дистанция (отсчеты)");
-    QwtScaleWidget *timeAxis=m_qwtPlot->axisWidget(QwtPlot::yLeft);
-    timeAxis->setTitle("Время (отсчеты)");
-
     const QwtInterval zInterval = d_spectrogram->data()->interval( Qt::ZAxis );
 
     QwtScaleWidget *rightAxis = m_qwtPlot->axisWidget( QwtPlot::yRight ); // Цветная полоса на правой оси
@@ -76,9 +69,6 @@ void CustomPlotterWidget::FillUI()
     m_qwtPlot->enableAxis( QwtPlot::yRight );
 
     m_qwtPlot->plotLayout()->setAlignCanvasToScales( true );
-
-
-
 }
 
 void CustomPlotterWidget::CreateBehavoirObjects()
@@ -114,17 +104,19 @@ void CustomPlotterWidget::ConnectObjects()
     connect(m_bottomDspControlPanel, &BottomDspControlPanel::ToRequestDSPData, this, &CustomPlotterWidget::ToRequestDSPData);
 }
 
-void CustomPlotterWidget::UpdateData(const quint32 &distSamplesNum, const quint32 &timeSamplesNum, const QVector<qreal> &data)
+void CustomPlotterWidget::UpdateSprectogram(const qint32 &minX, const qint32 &minY, const qint32 &maxX, const qint32 &maxY, const QVector<qreal> &data)
 { 
-    if (m_spectogramData->GetXMaxAxisValue() != distSamplesNum || m_spectogramData->GetYMaxAxisValue() != timeSamplesNum)
+    if (m_spectogramData->GetXMinAxisValue()!=minX || m_spectogramData->GetYMinAxisValue()!=minY || m_spectogramData->GetXMaxAxisValue() != maxX || m_spectogramData->GetYMaxAxisValue() != maxY)
     {
-        m_spectogramData->SetXMaxInterval(distSamplesNum);
-        m_spectogramData->SetYMaxInterval(timeSamplesNum);
-        m_qwtPlot->setAxisScale(QwtPlot::xBottom, m_spectogramData->xMinValueAxis, m_spectogramData->GetXMaxAxisValue());
-        m_qwtPlot->setAxisScale(QwtPlot::yLeft, m_spectogramData->yMinValueAxis, m_spectogramData->GetYMaxAxisValue());
+        m_spectogramData->SetXMinAxisValue(minX);
+        m_spectogramData->SetYMinAxisValue(minY);
+        m_spectogramData->SetXMaxInterval(maxX);
+        m_spectogramData->SetYMaxInterval(maxY);
+        m_qwtPlot->setAxisScale(QwtPlot::xBottom, m_spectogramData->GetXMinAxisValue(), m_spectogramData->GetXMaxAxisValue());
+        m_qwtPlot->setAxisScale(QwtPlot::yLeft, m_spectogramData->GetYMinAxisValue(), m_spectogramData->GetYMaxAxisValue());
     }
 
-    m_spectogramData->UpdateMatrix(distSamplesNum, timeSamplesNum, data);
+    m_spectogramData->UpdateMatrix(data);
 
 
     d_spectrogram->invalidateCache();
@@ -135,6 +127,22 @@ void CustomPlotterWidget::UpdateData(const quint32 &distSamplesNum, const quint3
 void CustomPlotterWidget::SetPageNumForGif(int value)
 {
     m_bottomDspControlPanel->SetPageNumForGif(value);
+}
+
+void CustomPlotterWidget::NameAxisSektorDsp()
+{
+    QwtScaleWidget *distanceAxis = m_qwtPlot->axisWidget( QwtPlot::xBottom );//устанавливаем подписи к спектограмме
+    distanceAxis->setTitle("Дистанция (отсчеты)");
+    QwtScaleWidget *timeAxis=m_qwtPlot->axisWidget(QwtPlot::yLeft);
+    timeAxis->setTitle("Время (отсчеты)");
+}
+
+void CustomPlotterWidget::NameAxisTrassaDsp()
+{
+    QwtScaleWidget *distanceAxis = m_qwtPlot->axisWidget( QwtPlot::xBottom );//устанавливаем подписи к спектограмме
+    distanceAxis->setTitle("Дистанция (метры)");
+    QwtScaleWidget *timeAxis=m_qwtPlot->axisWidget(QwtPlot::yLeft);
+    timeAxis->setTitle("Время (секунды)");
 }
 
 const QColor CustomPlotterWidget::GetMaxContrastColor(const QVector<QColor> &currentSpectorColors)
@@ -349,14 +357,14 @@ void CustomPlotterWidget::OnZoomHandler(const QRectF &rect)
         correctRect.setHeight(m_spectogramData->GetYMaxAxisValue() - rect.top());
     }
 
-//    if (correctRect!=rect)
-        if (!CompareRects(correctRect, rect))
-        {
-            m_pointViewer->zoom(-1);
-            m_pointViewer->zoom(correctRect);
+    //    if (correctRect!=rect)
+    if (!CompareRects(correctRect, rect))
+    {
+        m_pointViewer->zoom(-1);
+        m_pointViewer->zoom(correctRect);
 
-            m_qwtPlot->replot();
-        }
+        m_qwtPlot->replot();
+    }
 }
 
 

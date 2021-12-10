@@ -11,24 +11,31 @@ class SpectrogramData : public QwtMatrixRasterData {
 
 public:
     SpectrogramData();
-    SpectrogramData(int xMin, int yMin, int xMax, int yMax);
+
     ~SpectrogramData();
+
     void RefreshMatrix();
-    void UpdateMatrix(const quint32 &n, const quint32 &TimeSamplesNum, const QVector<qreal> &vector);
+    void UpdateMatrix(const QVector<qreal> &vector);
     void SetBackground();
 
-    quint16 GetXMaxAxisValue() const;
-    void SetXMaxInterval(const quint16 &value);
+    qint32 GetXMinAxisValue() const;
+    void SetXMinAxisValue(const qint32 &value);
 
-    quint16 GetYMaxAxisValue() const;
-    void SetYMaxInterval(const quint16 &value);
+    qint32 GetYMinAxisValue() const;
+    void SetYMinAxisValue(const qint32 &value);
 
-    const double xMinValueAxis = 0.0;
-    const double yMinValueAxis =0.0;
+    qint32 GetXMaxAxisValue() const;
+    void SetXMaxInterval(const qint32 &value);
+
+    qint32 GetYMaxAxisValue() const;
+    void SetYMaxInterval(const qint32 &value);
 
 private:
-    quint16 xMaxInterval = 32;
-    quint16 yMaxInterval = 2512;
+
+    qint32 xMinValueAxis = 0;
+    qint32 yMinValueAxis =0;
+    qint32 xMaxInterval = 32;
+    qint32 yMaxInterval = 2512;
     static const quint16 zMaxInterval = 100;
 
 

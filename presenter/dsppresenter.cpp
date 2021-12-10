@@ -47,7 +47,6 @@ void DspPresenter::ReadDspFromFile(const QString &fileName)
     }
 
     QByteArray data(dspFile.readAll());
-    int sizeOfByteArray = data.size();
     qint64 currentPosInByteArray = 0;
 
     dspFile.close();
@@ -190,7 +189,7 @@ void DspPresenter::ReadDspFromFile(const QString &fileName)
     CalculateAmplitude();
 
 
-    Q_EMIT ToSetSliderLimit(m_mapOfRawData.count());
+    Q_EMIT ToSetSliderLimit(m_mapOfRawData.count()-1);
 }
 
 //void DspPresenter::ReadDspFromDspFile(const QString &fileName)
@@ -343,12 +342,12 @@ void DspPresenter::ReadDspFromFile(const QString &fileName)
 //    }
 //}
 
-int DspPresenter::GetVectorOfDataElementsCount()
+int DspPresenter::GetDspFramesCount()
 {
     return m_vectorOfData.count();
 }
 
-const AmpBlockDSP DspPresenter::GetElementOfData(int elementIndex)
+const AmpBlockDSP DspPresenter::GetDspDataByIndex(int elementIndex)
 {
     if(elementIndex>=0 && elementIndex<m_vectorOfData.count())
     {
@@ -482,4 +481,9 @@ Magick::Image *DspPresenter::QImageToImage(const QImage &qimage)
     }
     newImage->animationDelay(20);
     return newImage;
+}
+
+qint32 DspPresenter::CalculateDistance(int num, int repeatCount)
+{
+    return MODE[num].dist * 49.507 * repeatCount;
 }
