@@ -1,0 +1,48 @@
+<!--SYNC-MODULE-SETTINGS-->
+<settings>
+<USERS lastUpdate="10.10.2021">
+    <user userId="1000" rank="Старшина" name="user" role="Оператор" FCS="Боченев"/>
+    <user userId="1001" rank="Сержант" name="user1" role="Администратор" FCS="Ермолаев В.Ю."/>
+    <user userId="1002" rank="Полковник" name="user2" role="Специалист" FCS="Микеров Игорь"/>
+</USERS>
+<FIRSTROLE roleName="Пользователь">
+    <desktops>
+        <desktopApp name="app1" exec="/home/user/application" type="Application" icon=""></desktopApp>
+        <desktopApp name="app2" exec="/home/user/application2" type="Application" icon=""></desktopApp>
+    </desktops>
+    <startups>
+        <startupApp exec="/home/user/application2"></startupApp>
+        <startupApp exec="/home/user/application3"></startupApp>
+        <startupApp exec="/home/user/application4"></startupApp>
+        <startupApp exec="/home/user/application5"></startupApp>
+        <startupApp exec="/home/user/application6"></startupApp>
+        <startupApp exec="/home/user/application7"></startupApp>
+    </startups>
+</FIRSTROLE>
+<SECONDROLE roleName="Оператор">
+    <desktops>
+        <desktopApp name="app1" exec="/home/user/application" type="Application" icon=""></desktopApp>
+    </desktops>
+    <startups>
+        <startupApp exec="/home/user/application"></startupApp>
+    </startups>
+</SECONDROLE>
+<THIRDROLE roleName="Специалист">
+    <desktops>
+        <desktopApp name="app2" exec="/home/user/application2" type="Application" icon=""></desktopApp>
+    </desktops>
+    <startups>
+        <startupApp exec="/home/user/application2"></startupApp>
+    </startups>
+</THIRDROLE>
+<FOURTHROLE roleName="Администратор">
+    <desktops>
+        <desktopApp name="app1" exec="/home/user/application" type="Application" icon=""></desktopApp>
+        <desktopApp name="app2" exec="/home/user/application2" type="Application" icon=""></desktopApp>
+    </desktops>
+    <startups>
+        <startupApp exec="/home/user/application"></startupApp>
+        <startupApp exec="/home/user/application2"></startupApp>
+    </startups>
+</FOURTHROLE>
+</settings>
